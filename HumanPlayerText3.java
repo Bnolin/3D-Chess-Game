@@ -23,11 +23,28 @@ public class HumanPlayerText3 extends Player {
 		Pattern p2 = Pattern.compile("[a-h][x][a-h][1-8]");
 		Pattern p3 = Pattern.compile("[RNBQK][a-h][1-8]");
 		Pattern p4 = Pattern.compile("[RNBQK][x][a-h][1-8]");
+		Pattern p5 = Pattern.compile("0-0-0");
+		Pattern p6 = Pattern.compile("0-0");
 		Matcher m1 = p1.matcher(moveString);
 		Matcher m2 = p2.matcher(moveString);
 		Matcher m3 = p3.matcher(moveString);
 		Matcher m4 = p4.matcher(moveString);
-
+		Matcher m5 = p5.matcher(moveString);
+		Matcher m6 = p6.matcher(moveString);
+		
+///CASTLING
+		if(m5.matches()){
+			int row;
+			if(c == Color.White){row = 0;}
+			else{row = 7;}
+			return new Move(new Square(4,row),new Square(2,row));
+		}
+		if(m6.matches()){
+			int row;
+			if(c == Color.White){row = 0;}
+			else{row = 7;}
+			return new Move(new Square(4,row),new Square(6,row));
+		}
 		
 ///FIND PIECE TYPE		
 		if(m1.matches() || m2.matches()){
