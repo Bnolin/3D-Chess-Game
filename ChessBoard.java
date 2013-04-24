@@ -6,7 +6,7 @@ public class ChessBoard{
 	public Move lastMove;
 	public BoardState bs;
 	public Square WKing,BKing;
-	public ArrayList<Move> turns;
+	public ArrayList<String> turns;
 	
 	public boolean WQCastle = true,
 					WKCastle = true,
@@ -15,7 +15,7 @@ public class ChessBoard{
 	public Color turn;
 	
 	public ChessBoard(){
-		turns = new ArrayList<Move>();
+		turns = new ArrayList<String>();
 		for(int col = 0; col < 8; col++){
 			for(int row = 0; row < 8; row++){
 				board[row][col] = Piece.empty;
@@ -77,6 +77,44 @@ public class ChessBoard{
 	}
 	
 	public void move(Move m){
+		m.string = "";
+		String s = "abcdefgh";
+		if(bs != null){
+			if(bs.moveType(m) == MoveType.castle){
+				if(m.To().Col() == 2){m.string = "0-0-0";}
+				else { m.string = "0-0";}
+			} else
+			if(bs.moveType(m) == MoveType.take || bs.moveType(m) == MoveType.enPassant){
+				switch(pieceAt(m.From())){
+				case blackPawn:case whitePawn: m.string = m.string.concat(s.substring(m.From().Col(),m.From().Col()+1));break;
+				case blackRook:case whiteRook: m.string = m.string.concat("R");break;
+				case blackKnight:case whiteKnight:m.string = m.string.concat("N");break;
+				case blackBishop:case whiteBishop:m.string = m.string.concat("B");break;
+				case blackQueen:case whiteQueen:m.string = m.string.concat("Q");break;
+				case blackKing:case whiteKing:m.string = m.string.concat("K");break; 
+				}
+				m.string = m.string.concat("x" + m.To());
+			} else
+			if(bs.moveType(m) == MoveType.move){
+				switch(pieceAt(m.From())){
+				case blackRook:case whiteRook: m.string = m.string.concat("R");break;
+				case blackKnight:case whiteKnight:m.string = m.string.concat("N");break;
+				case blackBishop:case whiteBishop:m.string = m.string.concat("B");break;
+				case blackQueen:case whiteQueen:m.string = m.string.concat("Q");break;
+				case blackKing:case whiteKing:m.string = m.string.concat("K");break;
+				}
+				m.string = m.string.concat(m.To().toString());
+			} else
+			if(bs.moveType(m) == MoveType.promotion){
+				m.string = m.To().toString() + "=Q";
+			}
+			for(int i = m.string.length(); i < 5; i++){
+				m.string = m.string.concat(" ");
+			}
+			
+			
+		}
+		
 		if((m.From().equals(BKing) || m.From().equals(WKing)) && (Math.abs(m.From().Col() - m.To().Col()) == 2)){
 			Move newM;
 			if(m.From().Col() > m.To().Col()){ // QueenSide
@@ -114,7 +152,7 @@ public class ChessBoard{
 		}
 		board[m.From().Col()][m.From().Row()] = Piece.empty;
 		lastMove = m;
-		turns.add(lastMove);
+		turns.add(lastMove.string);
 		if(bs != null){bs.update(m.To(), m.From());}
 		turn = turn.opposite();
 		
@@ -201,8 +239,8 @@ public class ChessBoard{
 		b.WKing = WKing.clone();
 		b.BKing = BKing.clone();
 		b.turn = turn;
-		b.turns = new ArrayList<Move>();
-		for(Move m:turns){b.turns.add(m.clone());}
+		b.turns = new ArrayList<String>();
+		for(String s:turns){b.turns.add(new String(s));}
 		return b;
 	}
 	public boolean checkForRepeat(){

@@ -2,6 +2,7 @@
 public class Move {
 	private Square from;
 	private Square to;
+	public String string;
 	
 	public Move (Square s1, Square s2){
 		from = s1;
