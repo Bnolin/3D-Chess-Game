@@ -96,6 +96,11 @@ public class Game {
 			turn();
 		}
 		b.displayBoard();
+		String s = b.turns.get(b.turns.size()-1);
+		while(s.endsWith(" ")){s = s.substring(0,s.length()-1);}
+		s = s.concat("+");
+		b.turns.remove(b.turns.size()-1);
+		b.turns.add(s);
 		displayGame();
 	}
 	

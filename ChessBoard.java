@@ -108,11 +108,6 @@ public class ChessBoard{
 			if(bs.moveType(m) == MoveType.promotion){
 				m.string = m.To().toString() + "=Q";
 			}
-			for(int i = m.string.length(); i < 5; i++){
-				m.string = m.string.concat(" ");
-			}
-			
-			
 		}
 		
 		if((m.From().equals(BKing) || m.From().equals(WKing)) && (Math.abs(m.From().Col() - m.To().Col()) == 2)){
@@ -152,11 +147,13 @@ public class ChessBoard{
 		}
 		board[m.From().Col()][m.From().Row()] = Piece.empty;
 		lastMove = m;
-		turns.add(lastMove.string);
 		if(bs != null){bs.update(m.To(), m.From());}
+		if(bs != null && bs.inCheck(turn.opposite())){m.string = m.string.concat("+");}
+		for(int i = m.string.length(); i < 5; i++){
+			m.string = m.string.concat(" ");
+		}
+		turns.add(lastMove.string);
 		turn = turn.opposite();
-		
-
 	}
 	
 	public void setBoard(ChessBoard b){
