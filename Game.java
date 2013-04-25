@@ -64,8 +64,8 @@ public class Game {
 	}
 	public void displayGame(){
 		for(int i = 0; i < b.turns.size(); i+=2){
-			if(i+1 == b.turns.size()){System.out.println((i+2)/2 + ". " + b.turns.get(i) + " | ");}
-			else{System.out.println((i+2)/2 + ". " + b.turns.get(i) + " | " + b.turns.get(i+1));}
+			if(i+1 == b.turns.size()){System.out.println((i+2)/2 + ". " + b.turns.get(i).string + " | ");}
+			else{System.out.println((i+2)/2 + ". " + b.turns.get(i).string + " | " + b.turns.get(i+1).string);}
 		}
 	}
 	
@@ -95,12 +95,12 @@ public class Game {
 		while (!bs.allMovesFor(turn).isEmpty() && !b.checkForRepeat()){
 			turn();
 		}
+		if(bs.inCheck(turn)){
+			int l = b.turns.size()-1;
+			while(b.turns.get(l).string.endsWith(" ")){b.turns.get(l).string = b.turns.get(l).string.substring(0,b.turns.get(l).string.length()-1);}
+			b.turns.get(l).string = b.turns.get(l).string.concat("+");
+		}
 		b.displayBoard();
-		String s = b.turns.get(b.turns.size()-1);
-		while(s.endsWith(" ")){s = s.substring(0,s.length()-1);}
-		s = s.concat("+");
-		b.turns.remove(b.turns.size()-1);
-		b.turns.add(s);
 		displayGame();
 	}
 	

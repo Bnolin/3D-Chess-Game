@@ -6,7 +6,7 @@ public class ChessBoard{
 	public Move lastMove;
 	public BoardState bs;
 	public Square WKing,BKing;
-	public ArrayList<String> turns;
+	public ArrayList<Move> turns;
 	
 	public boolean WQCastle = true,
 					WKCastle = true,
@@ -15,13 +15,13 @@ public class ChessBoard{
 	public Color turn;
 	
 	public ChessBoard(){
-		turns = new ArrayList<String>();
+		turns = new ArrayList<Move>();
 		for(int col = 0; col < 8; col++){
 			for(int row = 0; row < 8; row++){
 				board[row][col] = Piece.empty;
 			}
 		}
-		board[0][0] = Piece.whiteRook;
+/*		board[0][0] = Piece.whiteRook;
 		board[1][0] = Piece.whiteKnight;
 		board[2][0] = Piece.whiteBishop;
 		board[3][0] = Piece.whiteQueen;
@@ -45,8 +45,8 @@ public class ChessBoard{
 		}
 		WKing = new Square(4,0);
 		BKing = new Square(4,7);
-
-/*		
+*/
+		
 		board[0][0] = Piece.whiteKing;
 		WKing = new Square(0,0);
 		board[7][7] = Piece.blackKing;
@@ -58,7 +58,7 @@ public class ChessBoard{
 		BQCastle = false;
 		WKCastle = false;
 		WQCastle = false;
-*/		
+		
 		
 		
 		turn = Color.White;
@@ -152,7 +152,7 @@ public class ChessBoard{
 		for(int i = m.string.length(); i < 5; i++){
 			m.string = m.string.concat(" ");
 		}
-		turns.add(lastMove.string);
+		turns.add(lastMove);
 		turn = turn.opposite();
 	}
 	
@@ -236,8 +236,8 @@ public class ChessBoard{
 		b.WKing = WKing.clone();
 		b.BKing = BKing.clone();
 		b.turn = turn;
-		b.turns = new ArrayList<String>();
-		for(String s:turns){b.turns.add(new String(s));}
+		b.turns = new ArrayList<Move>();
+		for(Move m:turns){b.turns.add(m);}
 		return b;
 	}
 	public boolean checkForRepeat(){
