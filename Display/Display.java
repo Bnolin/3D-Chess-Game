@@ -307,7 +307,7 @@ public class Display extends JFrame implements GLEventListener{
 						switch(p){
 						case blackPawn:case whitePawn:pawn.Draw();break;
 						case blackRook:case whiteRook:rook.Draw();break;
-						case blackKnight:gl.glRotatef(180, 0, 1, 0);case whiteKnight:knight.Draw();break;
+						case blackKnight:gl.glRotatef(180, 0, 1, 0);case whiteKnight:gl.glRotatef(-45,0,1,0);gl.glScalef(1.5f,1.5f,1.5f);knight.Draw();break;
 						case blackBishop:case whiteBishop:bishop.Draw();break;
 						case blackQueen:case whiteQueen:queen.Draw();break;
 						case blackKing:case whiteKing:king.Draw();break;
