@@ -1,7 +1,5 @@
 package Display;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+
 import java.io.*;
 	import java.nio.FloatBuffer;
 	import java.nio.IntBuffer;
@@ -19,10 +17,11 @@ import Backend.*;
 
 import java.util.ArrayList;
 
-public class Display extends JFrame implements GLEventListener, MouseListener,MouseMotionListener{
+public class Display extends JFrame implements GLEventListener{
 
 	Game g;
-	
+	Move lastMove;
+	float translated = 0;
 	
 	class objModel {
 			public FloatBuffer vertexBuffer;
@@ -196,10 +195,7 @@ public class Display extends JFrame implements GLEventListener, MouseListener,Mo
 		
 		private float xpos = 0, ypos = 0, zpos = 0;
 		private float centerx, centery, centerz;
-		private float roth = 0, rotv = 0;
 		private float znear, zfar;
-		private int mouseX, mouseY, mouseButton;
-		private float motionSpeed, rotateSpeed;
 	
 		private objModel pawn = new objModel("pawn.obj");
 		private objModel rook = new objModel("rook.obj");
@@ -214,8 +210,8 @@ public class Display extends JFrame implements GLEventListener, MouseListener,Mo
 		 * transformation parameters to display the initial scene.
 		 * If these are not set correctly, the objects may disappear on start.
 		 */
-		private float xmin = -4f, ymin = -4f, zmin = -5f;
-		private float xmax = 4f, ymax = 4f, zmax = 5f;	
+		private float xmin = -4f, ymin = 0f, zmin = -5f;
+		private float xmax = 4f, ymax = 5f, zmax = 5f;	
 		
 		
 		public void display(GLAutoDrawable drawable) {
@@ -234,13 +230,13 @@ public class Display extends JFrame implements GLEventListener, MouseListener,Mo
 			gl.glTranslatef(-xpos, -ypos, -zpos);
 			gl.glTranslatef(centerx, centery, centerz);
 			
-			if(g.b.turn == Color.White){
-				gl.glRotatef(180-roth, 0, 1.0f, 0);
-				gl.glRotatef(-20+rotv, 1.0f, 0, 0);
-			} else {
-				gl.glRotatef(360-roth, 0, 1, 0);
-				gl.glRotatef(20+rotv, 1.0f, 0, 0);
-			}
+//			if(g.b.turn == Color.White){
+				gl.glRotatef(180, 0, 1.0f, 0);
+				gl.glRotatef(-30, 1.0f, 0, 0);
+//			} else {
+//				gl.glRotatef(360, 0, 1, 0);
+//				gl.glRotatef(30, 1.0f, 0, 0);
+//			}
 			
 			gl.glTranslatef(-centerx, -centery, -centerz);	
 			
@@ -263,6 +259,20 @@ public class Display extends JFrame implements GLEventListener, MouseListener,Mo
 			gl.glScalef(8, 8, 8);
 			board.Draw();
 			gl.glPopMatrix();
+			
+			boolean moving = false;
+			if(!lastMove.equals(b.lastMove)){
+				translated ++;
+				moving = true;
+			}
+			if(translated == 30){
+				translated = 0;
+				lastMove = b.lastMove;
+				moving = false;
+			}
+			float transI = (b.lastMove.From().Col()-b.lastMove.To().Col())*(1-translated/30.f);
+			float transJ = (b.lastMove.From().Row()-b.lastMove.To().Row())*(1-translated/30.f);
+
 			
 			for(int i = 0; i < 8; i++){
 				for(int j = 0; j < 8; j++){
@@ -289,8 +299,11 @@ public class Display extends JFrame implements GLEventListener, MouseListener,Mo
 						    gl.glMaterialfv( GL.GL_FRONT, GL.GL_DIFFUSE, mat_diffuse, 0);
 						    gl.glMaterialfv( GL.GL_FRONT, GL.GL_SHININESS, mat_shininess, 0);
 						}
-						
-						gl.glTranslatef(4-i, 0, j-4);
+						if(i != b.lastMove.To().Col() || j != b.lastMove.To().Row() || !moving){
+							gl.glTranslatef(4-i, 0, j-4);
+						} else {
+							gl.glTranslatef(4-(i+transI), 0, (j+transJ)-4);
+						}
 						switch(p){
 						case blackPawn:case whitePawn:pawn.Draw();break;
 						case blackRook:case whiteRook:rook.Draw();break;
@@ -309,6 +322,7 @@ public class Display extends JFrame implements GLEventListener, MouseListener,Mo
 		public Display(Game g) {
 			super("Assignment 3 -- Hierarchical Modeling");
 			this.g = g;
+			lastMove = g.b.lastMove;
 			canvas = new GLCanvas();
 			canvas.addGLEventListener(this);
 			animator = new FPSAnimator(canvas, 30);	// create a 30 fps animator
@@ -371,8 +385,6 @@ public class Display extends JFrame implements GLEventListener, MouseListener,Mo
 		 */	
 		void initViewParameters()
 		{
-			roth = rotv = 0;
-
 			float ball_r = (float) Math.sqrt((xmax-xmin)*(xmax-xmin)
 								+ (ymax-ymin)*(ymax-ymin)
 								+ (zmax-zmin)*(zmax-zmin)) * 0.707f;
@@ -387,71 +399,12 @@ public class Display extends JFrame implements GLEventListener, MouseListener,Mo
 			znear = 0.01f;
 			zfar  = 1000.f;
 			
-			motionSpeed = .002f * ball_r;
-			rotateSpeed = .1f;
 
 		}	
-		public void mousePressed(MouseEvent e) {	
-			mouseX = e.getX();
-			mouseY = e.getY();
-			mouseButton = e.getButton();
-			canvas.display();
-		}
-		
-		public void mouseReleased(MouseEvent e) {
-			mouseButton = MouseEvent.NOBUTTON;
-			canvas.display();
-		}	
-		
-		public void mouseDragged(MouseEvent e) {
-			int x = e.getX();
-			int y = e.getY();
-			if (mouseButton == MouseEvent.BUTTON3) {
-				zpos -= (y - mouseY) * motionSpeed;
-				mouseX = x;
-				mouseY = y;
-				canvas.display();
-			} else if (mouseButton == MouseEvent.BUTTON2) {
-				xpos -= (x - mouseX) * motionSpeed;
-				ypos += (y - mouseY) * motionSpeed;
-				mouseX = x;
-				mouseY = y;
-				canvas.display();
-			} else if (mouseButton == MouseEvent.BUTTON1) {
-				roth -= (x - mouseX) * rotateSpeed;
-				rotv += (y - mouseY) * rotateSpeed;
-				mouseX = x;
-				mouseY = y;
-				canvas.display();
-			}
-		}
 		
 		
 		// these event functions are not used for this assignment
 		public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) { }
 
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void mouseEntered(MouseEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void mouseExited(MouseEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void mouseMoved(MouseEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
 	}
 
