@@ -1,4 +1,6 @@
+package Backend;
 import java.util.ArrayList;
+
 
 public class ComputerPlayerFinal extends Player {
 	
@@ -141,13 +143,17 @@ public class ComputerPlayerFinal extends Player {
 		}
 	}
 	
+	public int level;
 	
+	public ComputerPlayerFinal(int level){
+		this.level = level;
+	}
 	
 	@Override
 	public Move getMove(ChessBoard b) {
 		b.displayBoard();
 
-		Node root = new Node(b.clone(),null,5);
+		Node root = new Node(b.clone(),null,level);
 		Node bestN = null;
 		for(Node n: root.generateChildren()){
 			if(!n.bs.inCheck(n.b.turn.opposite())){

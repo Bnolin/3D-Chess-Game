@@ -1,3 +1,5 @@
+package Backend;
+
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -42,6 +44,7 @@ public class Game {
 		}
 		if(bs.inCheck(turn.opposite())){System.out.println("Check");}
 		long endTime = System.currentTimeMillis();
+		while(endTime-startTime < 1000){endTime = System.currentTimeMillis();}
 		if(p == player1){
 			player1Time += endTime - startTime;
 			System.out.println("player's total used time: " + toTime(player1Time));
