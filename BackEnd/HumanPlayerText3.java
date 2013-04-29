@@ -1,3 +1,5 @@
+package Backend;
+
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -5,10 +7,18 @@ import java.util.regex.Pattern;
 
 public class HumanPlayerText3 extends Player {
 
-    private Scanner moveReader = new Scanner(System.in);
+    String moveString = null;
 
 	@Override
-	public Move getMove(ChessBoard b) {
+	public synchronized Move getMove(ChessBoard b) {
+
+		while(moveString == null){try {
+			wait();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}}
+		
 		b.displayBoard();
 		b.bs = new BoardState(b);
 		
@@ -16,8 +26,6 @@ public class HumanPlayerText3 extends Player {
 		Piece p;
 		Square toSquare;
 		Move m = null;		
-		
-		String moveString = moveReader.next();
 		
 		Pattern p1 = Pattern.compile("[a-h][1-8]");
 		Pattern p2 = Pattern.compile("[a-h][x][a-h][1-8]");
@@ -92,6 +100,7 @@ public class HumanPlayerText3 extends Player {
 			}
 		}
 		if(m == null){System.out.println("move not found");return getMove(b);}
+		moveString = null;
 		return m;
 	}
 
@@ -99,6 +108,11 @@ public class HumanPlayerText3 extends Player {
 	public void hasMoved(Move m) {
 		// TODO Auto-generated method stub
 
+	}
+
+	public synchronized void input(String textInput) {
+		moveString = textInput;
+		notify();
 	}
 
 }

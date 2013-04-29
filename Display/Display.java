@@ -1,5 +1,8 @@
 package Display;
 
+import java.awt.Font;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.*;
 	import java.nio.FloatBuffer;
 	import java.nio.IntBuffer;
@@ -14,13 +17,15 @@ import Backend.*;
 
 	import com.sun.opengl.util.BufferUtil;
 	import com.sun.opengl.util.FPSAnimator;
+import com.sun.opengl.util.j2d.TextRenderer;
 
 import java.util.ArrayList;
 
-public class Display extends JFrame implements GLEventListener{
+public class Display extends JFrame implements GLEventListener, KeyListener{
 
 	Game g;
 	Move lastMove;
+	String textInput = "";
 	float translated = 0;
 	
 	class objModel {
@@ -187,6 +192,7 @@ public class Display extends JFrame implements GLEventListener{
 		private GL gl;
 		private final GLU glu = new GLU();	
 		private FPSAnimator animator;
+		private TextRenderer text;
 
 		private int winW = 800, winH = 800;
 		private boolean wireframe = false;
@@ -226,9 +232,13 @@ public class Display extends JFrame implements GLEventListener{
 			
 			gl.glLoadIdentity();
 			
+				text.beginRendering(800, 800);
+				text.draw(textInput, 0, winH);
+				text.endRendering();
+			
 			/* this is the transformation of the entire scene */
 			gl.glTranslatef(-xpos, -ypos, -zpos);
-			gl.glTranslatef(centerx, centery, centerz);
+			gl.glTranslatef(centerx, centery, centerz);			
 			
 //			if(g.b.turn == Color.White){
 				gl.glRotatef(180, 0, 1.0f, 0);
@@ -325,7 +335,9 @@ public class Display extends JFrame implements GLEventListener{
 			lastMove = g.b.lastMove;
 			canvas = new GLCanvas();
 			canvas.addGLEventListener(this);
+			canvas.addKeyListener(this);
 			animator = new FPSAnimator(canvas, 30);	// create a 30 fps animator
+			text = new TextRenderer(new Font("SansSerif", Font.BOLD, 36));
 			getContentPane().add(canvas);
 			setSize(winW, winH);
 			setLocationRelativeTo(null);
@@ -401,10 +413,45 @@ public class Display extends JFrame implements GLEventListener{
 			
 
 		}	
+		String validChars = "RNBQK0abcdefgh12345678x-";
+		public void keyPressed(KeyEvent e) {
+			if(e.getKeyCode() == KeyEvent.VK_ENTER){
+				if(g.turn == Color.White && g.player1.getClass() == HumanPlayerText3.class){
+					HumanPlayerText3 tempP = (HumanPlayerText3) g.player1;
+					tempP.input(textInput);
+					textInput = "";
+				}
+				if(g.turn == Color.Black && g.player2.getClass() == HumanPlayerText3.class){
+					HumanPlayerText3 tempP = (HumanPlayerText3) g.player2;
+					tempP.input(textInput);
+					textInput = "";
+				}
+			} else 
+			if(e.getID() == KeyEvent.VK_DELETE){
+				textInput = textInput.substring(0,textInput.length()-1);
+			}else
+			if(validChars.contains(""+e.getKeyChar())){textInput += ""+e.getKeyChar();}
+			
+			canvas.display();
+		}
+
+		
 		
 		
 		// these event functions are not used for this assignment
 		public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) { }
+
+		@Override
+		public void keyReleased(KeyEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void keyTyped(KeyEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
 
 	}
 
