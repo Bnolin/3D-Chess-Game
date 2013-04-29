@@ -9,6 +9,7 @@ import java.io.*;
 
 	import javax.media.opengl.*;
 	import javax.media.opengl.glu.GLU;
+import javax.media.opengl.glu.GLUquadric;
 	import javax.swing.JFrame;
 	import javax.vecmath.Point3f;
 	import javax.vecmath.Vector3f;
@@ -18,6 +19,9 @@ import Backend.*;
 	import com.sun.opengl.util.BufferUtil;
 	import com.sun.opengl.util.FPSAnimator;
 import com.sun.opengl.util.j2d.TextRenderer;
+import com.sun.opengl.util.texture.Texture;
+import com.sun.opengl.util.texture.TextureData;
+import com.sun.opengl.util.texture.TextureIO;
 
 import java.util.ArrayList;
 
@@ -33,6 +37,7 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 			public IntBuffer faceBuffer;
 			public FloatBuffer normalBuffer;
 			public Point3f center;
+			public float bottom;
 			public int num_verts;		// number of vertices
 			public int num_faces;		// number of triangle faces
 
@@ -62,7 +67,7 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 					System.exit(0);
 				}
 
-				center = new Point3f();			
+				center = new Point3f();	
 				float x, y, z;
 				int v1, v2, v3;
 				float minx, miny, minz;
@@ -129,7 +134,8 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 					p.y = (p.y - center.y) / bbmax;
 					p.z = (p.z - center.z) / bbmax;
 				}
-				center.x = center.y = center.z = 0.f;
+				bottom = (miny - center.y) / bbmax;
+					center.x = center.y = center.z = 0.f;
 				
 				/* estimate per vertex average normal */
 				int i;
@@ -217,7 +223,8 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 		 * If these are not set correctly, the objects may disappear on start.
 		 */
 		private float xmin = -4f, ymin = 0f, zmin = -5f;
-		private float xmax = 4f, ymax = 5f, zmax = 5f;	
+		private float xmax = 4f, ymax = 5f, zmax = 5f;
+		private Texture boardTexture;	
 		
 		
 		public void display(GLAutoDrawable drawable) {
@@ -253,19 +260,8 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 			ChessBoard b = g.b;
 			Piece p;
 			
-			
 			gl.glPushMatrix();
-
-		    float boardmat_ambient[] = { 0, 0, 0, 1 };
-		    float boardmat_specular[] = { -.5f, -.5f, .5f, 1 };
-		    float boardmat_diffuse[] = { 1, 1, 1, 1 };
-		    float boardmat_shininess[] = { 128 };
-		    gl.glMaterialfv( GL.GL_FRONT, GL.GL_AMBIENT, boardmat_ambient, 0);
-		    gl.glMaterialfv( GL.GL_FRONT, GL.GL_SPECULAR, boardmat_specular, 0);
-		    gl.glMaterialfv( GL.GL_FRONT, GL.GL_DIFFUSE, boardmat_diffuse, 0);
-		    gl.glMaterialfv( GL.GL_FRONT, GL.GL_SHININESS, boardmat_shininess, 0);
-			
-			gl.glTranslatef(0, -1f, 0);
+			gl.glTranslatef(.5f, 0, -.5f);
 			gl.glScalef(8, 8, 8);
 			board.Draw();
 			gl.glPopMatrix();
@@ -282,7 +278,6 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 			}
 			float transI = (b.lastMove.From().Col()-b.lastMove.To().Col())*(1-translated/30.f);
 			float transJ = (b.lastMove.From().Row()-b.lastMove.To().Row())*(1-translated/30.f);
-
 			
 			for(int i = 0; i < 8; i++){
 				for(int j = 0; j < 8; j++){
@@ -315,12 +310,12 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 							gl.glTranslatef(4-(i+transI), 0, (j+transJ)-4);
 						}
 						switch(p){
-						case blackPawn:case whitePawn:pawn.Draw();break;
-						case blackRook:case whiteRook:rook.Draw();break;
-						case blackKnight:gl.glRotatef(180, 0, 1, 0);case whiteKnight:gl.glRotatef(-45,0,1,0);gl.glScalef(1.5f,1.5f,1.5f);knight.Draw();break;
-						case blackBishop:case whiteBishop:bishop.Draw();break;
-						case blackQueen:case whiteQueen:queen.Draw();break;
-						case blackKing:case whiteKing:king.Draw();break;
+						case blackPawn:case whitePawn:gl.glTranslatef(0, -pawn.bottom, 0);pawn.Draw();break;
+						case blackRook:case whiteRook:gl.glTranslatef(0, -rook.bottom, 0);rook.Draw();break;
+						case blackKnight:gl.glRotatef(180, 0, 1, 0);case whiteKnight:gl.glTranslatef(0, -knight.bottom+.25f, 0);gl.glRotatef(-45,0,1,0);gl.glScalef(1.5f,1.5f,1.5f);knight.Draw();break;
+						case blackBishop:case whiteBishop:gl.glTranslatef(0, -bishop.bottom, 0);bishop.Draw();break;
+						case blackQueen:case whiteQueen:gl.glTranslatef(0, -queen.bottom, 0);queen.Draw();break;
+						case blackKing:case whiteKing:gl.glTranslatef(0, -king.bottom, 0);king.Draw();break;
 						}
 						gl.glPopMatrix();
 					}
@@ -378,7 +373,21 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 			gl.glHint(GL.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
 			gl.glCullFace(GL.GL_BACK);
 			gl.glEnable(GL.GL_CULL_FACE);
-			gl.glShadeModel(GL.GL_SMOOTH);		
+			gl.glShadeModel(GL.GL_SMOOTH);
+			
+			
+			try {
+	            TextureData data = TextureIO.newTextureData(new File("board.png"), false, TextureIO.PNG);
+	            boardTexture = TextureIO.newTexture(data);
+	        }
+	        catch (IOException exc) {
+	            exc.printStackTrace();
+	            System.exit(1);
+	        }
+			
+			
+			
+			
 		}
 		
 		public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
