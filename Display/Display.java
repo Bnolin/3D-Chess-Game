@@ -295,9 +295,9 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 						    gl.glMaterialfv( GL.GL_FRONT, GL.GL_DIFFUSE, mat_diffuse, 0);
 						    gl.glMaterialfv( GL.GL_FRONT, GL.GL_SHININESS, mat_shininess, 0);
 						} else {
-						    float mat_ambient[] = { 0, 0, 0, 1 };
+						    float mat_ambient[] = { .1f, .1f, .1f, 1 };
 						    float mat_specular[] = { 1, 1, 1, 1 };
-						    float mat_diffuse[] = { .3f, .3f, .3f, 1 };
+						    float mat_diffuse[] = { .1f, .1f, .1f, 0 };
 						    float mat_shininess[] = { 128 };
 						    gl.glMaterialfv( GL.GL_FRONT, GL.GL_AMBIENT, mat_ambient, 0);
 						    gl.glMaterialfv( GL.GL_FRONT, GL.GL_SPECULAR, mat_specular, 0);
@@ -424,23 +424,26 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 		}	
 		String validChars = "RNBQK0abcdefgh12345678x-";
 		public void keyPressed(KeyEvent e) {
-			if(e.getKeyCode() == KeyEvent.VK_ENTER){
-				if(g.turn == Color.White && g.player1.getClass() == HumanPlayerText3.class){
-					HumanPlayerText3 tempP = (HumanPlayerText3) g.player1;
-					tempP.input(textInput);
-					textInput = "";
-				}
-				if(g.turn == Color.Black && g.player2.getClass() == HumanPlayerText3.class){
-					HumanPlayerText3 tempP = (HumanPlayerText3) g.player2;
-					tempP.input(textInput);
-					textInput = "";
-				}
-			} else 
-			if(e.getID() == KeyEvent.VK_DELETE){
-				textInput = textInput.substring(0,textInput.length()-1);
-			}else
-			if(validChars.contains(""+e.getKeyChar())){textInput += ""+e.getKeyChar();}
-			
+			if((g.turn == Color.White && g.player1.getClass() == HumanPlayerText3.class) || (g.turn == Color.Black && g.player2.getClass() == HumanPlayerText3.class)){
+				if(e.getKeyCode() == KeyEvent.VK_ENTER){
+					if(g.turn == Color.White && g.player1.getClass() == HumanPlayerText3.class){
+						HumanPlayerText3 tempP = (HumanPlayerText3) g.player1;
+						tempP.input(textInput);
+						textInput = "";
+					}
+					if(g.turn == Color.Black && g.player2.getClass() == HumanPlayerText3.class){
+						HumanPlayerText3 tempP = (HumanPlayerText3) g.player2;
+						tempP.input(textInput);
+						textInput = "";
+					}
+				} else 
+				if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE){
+					if(textInput.length() > 0){
+						textInput = textInput.substring(0,textInput.length()-1);
+					}
+				}else
+				if(validChars.contains(""+e.getKeyChar())){textInput += ""+e.getKeyChar();}
+			}
 			canvas.display();
 		}
 
