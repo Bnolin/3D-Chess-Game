@@ -223,7 +223,7 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 		 * If these are not set correctly, the objects may disappear on start.
 		 */
 		private float xmin = -4f, ymin = 0f, zmin = -5f;
-		private float xmax = 4f, ymax = 5f, zmax = 5f;
+		private float xmax = 4f, ymax = 0f, zmax = 5f;
 		private Texture boardTexture;	
 		
 		
@@ -245,15 +245,14 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 			
 			/* this is the transformation of the entire scene */
 			gl.glTranslatef(-xpos, -ypos, -zpos);
-			gl.glTranslatef(centerx, centery, centerz);			
-			
-//			if(g.b.turn == Color.White){
+			gl.glTranslatef(centerx, centery, centerz);	
+						
+			if((g.turn == Color.Black || g.player1.getClass() == ComputerPlayer.class) && g.player2.getClass() == HumanPlayer.class){
+				gl.glRotatef(30, 1, 0, 0);
+			} else {
 				gl.glRotatef(180, 0, 1.0f, 0);
 				gl.glRotatef(-30, 1.0f, 0, 0);
-//			} else {
-//				gl.glRotatef(360, 0, 1, 0);
-//				gl.glRotatef(30, 1.0f, 0, 0);
-//			}
+			}
 			
 			gl.glTranslatef(-centerx, -centery, -centerz);	
 			
@@ -261,7 +260,21 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 			Piece p;
 			
 			gl.glPushMatrix();
-			gl.glTranslatef(.5f, 0, -.5f);
+//		    float bmat_ambient[] = { 0, 0, 0, 1 };
+//		    float bmat_specular[] = { 1, 1, 1, 1 };
+//		    float bmat_diffuse[] = { 1, 1, 1, 1 };
+//		    float bmat_shininess[] = { 128 };
+//		    gl.glMaterialfv( GL.GL_FRONT, GL.GL_AMBIENT, bmat_ambient, 0);
+//		    gl.glMaterialfv( GL.GL_FRONT, GL.GL_SPECULAR, bmat_specular, 0);
+//		    gl.glMaterialfv( GL.GL_FRONT, GL.GL_DIFFUSE, bmat_diffuse, 0);
+//		    gl.glMaterialfv( GL.GL_FRONT, GL.GL_SHININESS, bmat_shininess, 0);
+			
+			boardTexture.enable();
+			boardTexture.bind();
+			
+			
+			
+			
 			gl.glScalef(8, 8, 8);
 			board.Draw();
 			gl.glPopMatrix();
@@ -304,15 +317,25 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 						    gl.glMaterialfv( GL.GL_FRONT, GL.GL_DIFFUSE, mat_diffuse, 0);
 						    gl.glMaterialfv( GL.GL_FRONT, GL.GL_SHININESS, mat_shininess, 0);
 						}
+						gl.glTranslatef(-.5f, 0, .5f);
 						if(i != b.lastMove.To().Col() || j != b.lastMove.To().Row() || !moving){
 							gl.glTranslatef(4-i, 0, j-4);
 						} else {
 							gl.glTranslatef(4-(i+transI), 0, (j+transJ)-4);
 						}
 						switch(p){
-						case blackPawn:case whitePawn:gl.glTranslatef(0, -pawn.bottom, 0);pawn.Draw();break;
-						case blackRook:case whiteRook:gl.glTranslatef(0, -rook.bottom, 0);rook.Draw();break;
-						case blackKnight:gl.glRotatef(180, 0, 1, 0);case whiteKnight:gl.glTranslatef(0, -knight.bottom+.25f, 0);gl.glRotatef(-45,0,1,0);gl.glScalef(1.5f,1.5f,1.5f);knight.Draw();break;
+						case blackPawn:case whitePawn:
+							gl.glScalef(.75f, .75f, .75f);
+							gl.glTranslatef(0, -pawn.bottom, 0);pawn.Draw();
+							break;
+						case blackRook:case whiteRook:
+							gl.glTranslatef(0, -rook.bottom, 0);rook.Draw();
+							break;
+						case blackKnight:gl.glRotatef(180, 0, 1, 0);
+						case whiteKnight:
+							gl.glTranslatef(0, -knight.bottom, 0);
+							gl.glRotatef(-45,0,1,0);
+							knight.Draw();break;
 						case blackBishop:case whiteBishop:gl.glTranslatef(0, -bishop.bottom, 0);bishop.Draw();break;
 						case blackQueen:case whiteQueen:gl.glTranslatef(0, -queen.bottom, 0);queen.Draw();break;
 						case blackKing:case whiteKing:gl.glTranslatef(0, -king.bottom, 0);king.Draw();break;
@@ -345,7 +368,7 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 			gl = drawable.getGL();
 
 			initViewParameters();
-			gl.glClearColor(.5f, .5f, .5f, 5f);
+			gl.glClearColor(.3f, .3f, .3f, 1f);
 			gl.glClearDepth(1.0f);
 
 		    // white light at the eye
@@ -367,7 +390,8 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 		    gl.glEnable( GL.GL_LIGHT0 );
 		    gl.glEnable( GL.GL_LIGHT1 );
 		    gl.glEnable( GL.GL_LIGHT2 );
-
+	
+		    
 		    gl.glEnable(GL.GL_DEPTH_TEST);
 			gl.glDepthFunc(GL.GL_LESS);
 			gl.glHint(GL.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
@@ -384,10 +408,6 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 	            exc.printStackTrace();
 	            System.exit(1);
 	        }
-			
-			
-			
-			
 		}
 		
 		public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
@@ -424,15 +444,15 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 		}	
 		String validChars = "RNBQK0abcdefgh12345678x-";
 		public void keyPressed(KeyEvent e) {
-			if((g.turn == Color.White && g.player1.getClass() == HumanPlayerText3.class) || (g.turn == Color.Black && g.player2.getClass() == HumanPlayerText3.class)){
+			if((g.turn == Color.White && g.player1.getClass() == HumanPlayer.class) || (g.turn == Color.Black && g.player2.getClass() == HumanPlayer.class)){
 				if(e.getKeyCode() == KeyEvent.VK_ENTER){
-					if(g.turn == Color.White && g.player1.getClass() == HumanPlayerText3.class){
-						HumanPlayerText3 tempP = (HumanPlayerText3) g.player1;
+					if(g.turn == Color.White && g.player1.getClass() == HumanPlayer.class){
+						HumanPlayer tempP = (HumanPlayer) g.player1;
 						tempP.input(textInput);
 						textInput = "";
 					}
-					if(g.turn == Color.Black && g.player2.getClass() == HumanPlayerText3.class){
-						HumanPlayerText3 tempP = (HumanPlayerText3) g.player2;
+					if(g.turn == Color.Black && g.player2.getClass() == HumanPlayer.class){
+						HumanPlayer tempP = (HumanPlayer) g.player2;
 						tempP.input(textInput);
 						textInput = "";
 					}
