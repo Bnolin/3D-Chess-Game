@@ -2,7 +2,7 @@ package Backend;
 import java.util.ArrayList;
 
 
-public class ComputerPlayerFinal extends Player {
+public class ComputerPlayer extends Player {
 	
 	public class Node{
 		ChessBoard b;
@@ -145,7 +145,7 @@ public class ComputerPlayerFinal extends Player {
 	
 	public int level;
 	
-	public ComputerPlayerFinal(int level){
+	public ComputerPlayer(int level){
 		this.level = level;
 	}
 	

@@ -5,7 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class HumanPlayerText3 extends Player {
+public class HumanPlayer extends Player {
 
     String moveString = null;
 
@@ -68,6 +68,7 @@ public class HumanPlayerText3 extends Player {
 			}
 		} else {
 			System.out.println("not valid syntax");
+			moveString = null;
 			return getMove(b);
 		}
 		
@@ -99,8 +100,8 @@ public class HumanPlayerText3 extends Player {
 				}
 			}
 		}
-		if(m == null){System.out.println("move not found");return getMove(b);}
 		moveString = null;
+		if(m == null){System.out.println("move not found");return getMove(b);}
 		return m;
 	}
 
