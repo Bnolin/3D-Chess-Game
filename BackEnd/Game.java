@@ -1,11 +1,10 @@
 package Backend;
 
-import java.sql.Time;
-import java.util.ArrayList;
+import java.util.Observable;
 import java.util.concurrent.TimeUnit;
 
 
-public class Game {
+public class Game  extends Observable{
 	public ChessBoard b;
 	public BoardState bs;
 	public Color turn = Color.White;
@@ -23,7 +22,7 @@ public class Game {
 		player2 = p2;
 	}
 	
-	public void turn(){
+	public synchronized void turn(){
 		Player p;
 		if(turn == Color.White){p = player1;}
 		else{p = player2;}
@@ -56,6 +55,8 @@ public class Game {
 		System.out.println("current move time: " + toTime(endTime-startTime));
 		player1.hasMoved(currentMove);
 		player2.hasMoved(currentMove);
+		setChanged();
+		notifyObservers();
 		turn = turn.opposite();
 	}
 	public String toTime(long milsec){
@@ -106,6 +107,5 @@ public class Game {
 		b.displayBoard();
 		displayGame();
 	}
-	
 	
 }

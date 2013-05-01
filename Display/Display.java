@@ -24,8 +24,10 @@ import com.sun.opengl.util.texture.TextureData;
 import com.sun.opengl.util.texture.TextureIO;
 
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
-public class Display extends JFrame implements GLEventListener, KeyListener{
+public class Display extends JFrame implements GLEventListener, KeyListener, Observer{
 
 	Game g;
 	Move lastMove;
@@ -222,12 +224,20 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 		 * transformation parameters to display the initial scene.
 		 * If these are not set correctly, the objects may disappear on start.
 		 */
-		private float xmin = -4f, ymin = 0f, zmin = -5f;
-		private float xmax = 4f, ymax = 0f, zmax = 5f;
+		private float xmin = -4f, ymin = 0f, zmin = -4f;
+		private float xmax = 4f, ymax = 0f, zmax = 4f;
 		private Texture boardTexture;	
 		
 		
-		public void display(GLAutoDrawable drawable) {
+		public synchronized void display(GLAutoDrawable drawable) {
+			if(animator.isAnimating() && (lastMove.equals(g.currentMove) || g.currentMove == null)){				
+				animator.stop();				
+			}
+			if(!animator.isAnimating() && !lastMove.equals(g.currentMove) && g.currentMove != null){
+				animator.start();
+			}
+			
+			
 			gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 			
 			gl.glPolygonMode(GL.GL_FRONT_AND_BACK, wireframe ? GL.GL_LINE : GL.GL_FILL);	
@@ -260,21 +270,15 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 			Piece p;
 			
 			gl.glPushMatrix();
-//		    float bmat_ambient[] = { 0, 0, 0, 1 };
-//		    float bmat_specular[] = { 1, 1, 1, 1 };
-//		    float bmat_diffuse[] = { 1, 1, 1, 1 };
-//		    float bmat_shininess[] = { 128 };
-//		    gl.glMaterialfv( GL.GL_FRONT, GL.GL_AMBIENT, bmat_ambient, 0);
-//		    gl.glMaterialfv( GL.GL_FRONT, GL.GL_SPECULAR, bmat_specular, 0);
-//		    gl.glMaterialfv( GL.GL_FRONT, GL.GL_DIFFUSE, bmat_diffuse, 0);
-//		    gl.glMaterialfv( GL.GL_FRONT, GL.GL_SHININESS, bmat_shininess, 0);
-			
-			boardTexture.enable();
-			boardTexture.bind();
-			
-			
-			
-			
+	//	    float bmat_ambient[] = { 0, 0, 0, 1 };
+	//	    float bmat_specular[] = { 1, 1, 1, 1 };
+	//	    float bmat_diffuse[] = { 1, 1, 1, 1 };
+	//	    float bmat_shininess[] = { 128 };
+	//	    gl.glMaterialfv( GL.GL_FRONT, GL.GL_AMBIENT, bmat_ambient, 0);
+	//	    gl.glMaterialfv( GL.GL_FRONT, GL.GL_SPECULAR, bmat_specular, 0);
+	//	    gl.glMaterialfv( GL.GL_FRONT, GL.GL_DIFFUSE, bmat_diffuse, 0);
+	//	    gl.glMaterialfv( GL.GL_FRONT, GL.GL_SHININESS, bmat_shininess, 0);
+		    		
 			gl.glScalef(8, 8, 8);
 			board.Draw();
 			gl.glPopMatrix();
@@ -344,18 +348,18 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 					}
 				}
 			}
-
 		}	
 		
 		public Display(Game g) {
-			super("Assignment 3 -- Hierarchical Modeling");
+			super("3D-Chess-Game");
 			this.g = g;
 			lastMove = g.b.lastMove;
 			canvas = new GLCanvas();
 			canvas.addGLEventListener(this);
 			canvas.addKeyListener(this);
+			g.addObserver(this);
 			animator = new FPSAnimator(canvas, 30);	// create a 30 fps animator
-			text = new TextRenderer(new Font("SansSerif", Font.BOLD, 36));
+			text = new TextRenderer(new Font("SansSerif", Font.BOLD, 18));
 			getContentPane().add(canvas);
 			setSize(winW, winH);
 			setLocationRelativeTo(null);
@@ -399,7 +403,6 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 			gl.glEnable(GL.GL_CULL_FACE);
 			gl.glShadeModel(GL.GL_SMOOTH);
 			
-			
 			try {
 	            TextureData data = TextureIO.newTextureData(new File("board.png"), false, TextureIO.PNG);
 	            boardTexture = TextureIO.newTexture(data);
@@ -409,7 +412,6 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 	            System.exit(1);
 	        }
 		}
-		
 		public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
 			winW = width;
 			winH = height;
@@ -483,6 +485,11 @@ public class Display extends JFrame implements GLEventListener, KeyListener{
 		public void keyTyped(KeyEvent arg0) {
 			// TODO Auto-generated method stub
 			
+		}
+
+		@Override
+		public void update(Observable arg0, Object arg1) {
+			canvas.display();
 		}
 
 	}
