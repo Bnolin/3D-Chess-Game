@@ -224,8 +224,8 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Obs
 		 * transformation parameters to display the initial scene.
 		 * If these are not set correctly, the objects may disappear on start.
 		 */
-		private float xmin = -4f, ymin = 0f, zmin = -4f;
-		private float xmax = 4f, ymax = 0f, zmax = 4f;
+		private float xmin = -4f, ymin = 0f, zmin = -5f;
+		private float xmax = 4f, ymax = 0f, zmax = 5f;
 		private Texture boardTexture;	
 		
 		
@@ -242,10 +242,7 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Obs
 			
 			gl.glPolygonMode(GL.GL_FRONT_AND_BACK, wireframe ? GL.GL_LINE : GL.GL_FILL);	
 			gl.glShadeModel(flatshade ? GL.GL_FLAT : GL.GL_SMOOTH);		
-			if (cullface)
-				gl.glEnable(GL.GL_CULL_FACE);
-			else
-				gl.glDisable(GL.GL_CULL_FACE);		
+			gl.glEnable(GL.GL_CULL_FACE);		
 			
 			gl.glLoadIdentity();
 			
@@ -258,30 +255,41 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Obs
 			gl.glTranslatef(centerx, centery, centerz);	
 						
 			if((g.turn == Color.Black || g.player1.getClass() == ComputerPlayer.class) && g.player2.getClass() == HumanPlayer.class){
-				gl.glRotatef(30, 1, 0, 0);
+		         glu.gluLookAt(0, .57735, 1, 0, 0, 0, 0, 1, 0);
+		         gl.glNormal3f(0,0,1);
 			} else {
-				gl.glRotatef(180, 0, 1.0f, 0);
-				gl.glRotatef(-30, 1.0f, 0, 0);
+		         glu.gluLookAt(0, .57735, -1, 0, 0, 0, 0, 1, 0);
+		         gl.glNormal3f(0,0,-1);
 			}
+						
+			gl.glTranslatef(-centerx, -centery, -centerz);
 			
-			gl.glTranslatef(-centerx, -centery, -centerz);	
 			
 			ChessBoard b = g.b;
 			Piece p;
+						
+			float[] rgba = {1f, 1f, 1f};
+		    gl.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, rgba, 0);
+		    gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, rgba, 0);
+		    gl.glMaterialf(GL.GL_FRONT, GL.GL_SHININESS, 0.5f);
 			
-			gl.glPushMatrix();
-	//	    float bmat_ambient[] = { 0, 0, 0, 1 };
-	//	    float bmat_specular[] = { 1, 1, 1, 1 };
-	//	    float bmat_diffuse[] = { 1, 1, 1, 1 };
-	//	    float bmat_shininess[] = { 128 };
-	//	    gl.glMaterialfv( GL.GL_FRONT, GL.GL_AMBIENT, bmat_ambient, 0);
-	//	    gl.glMaterialfv( GL.GL_FRONT, GL.GL_SPECULAR, bmat_specular, 0);
-	//	    gl.glMaterialfv( GL.GL_FRONT, GL.GL_DIFFUSE, bmat_diffuse, 0);
-	//	    gl.glMaterialfv( GL.GL_FRONT, GL.GL_SHININESS, bmat_shininess, 0);
-		    		
-			gl.glScalef(8, 8, 8);
-			board.Draw();
-			gl.glPopMatrix();
+		    boardTexture.enable();
+			boardTexture.bind();
+	//        gl.glNormal3f(0,0,1);
+			gl.glBegin(GL.GL_QUADS);
+				gl.glTexCoord2f(0, 0);
+				gl.glVertex3f(-4, 0, -4);
+				gl.glTexCoord2f(0, 1);
+				gl.glVertex3f(-4, 0, 4);
+				gl.glTexCoord2f(1, 1);
+				gl.glVertex3f(4, 0, 4);
+				gl.glTexCoord2f(1, 0);
+				gl.glVertex3f(4, 0, -4);
+			gl.glEnd();
+			gl.glFlush();
+			boardTexture.disable();
+			
+			
 			
 			boolean moving = false;
 			if(!lastMove.equals(b.lastMove)){
@@ -295,6 +303,8 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Obs
 			}
 			float transI = (b.lastMove.From().Col()-b.lastMove.To().Col())*(1-translated/30.f);
 			float transJ = (b.lastMove.From().Row()-b.lastMove.To().Row())*(1-translated/30.f);
+			
+			System.out.println(transI + "  " + transJ);
 			
 			for(int i = 0; i < 8; i++){
 				for(int j = 0; j < 8; j++){
@@ -312,9 +322,9 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Obs
 						    gl.glMaterialfv( GL.GL_FRONT, GL.GL_DIFFUSE, mat_diffuse, 0);
 						    gl.glMaterialfv( GL.GL_FRONT, GL.GL_SHININESS, mat_shininess, 0);
 						} else {
-						    float mat_ambient[] = { .1f, .1f, .1f, 1 };
+						    float mat_ambient[] = { 0f, 0f, 0f, 1 };
 						    float mat_specular[] = { 1, 1, 1, 1 };
-						    float mat_diffuse[] = { .1f, .1f, .1f, 0 };
+						    float mat_diffuse[] = { .3f, .3f, .3f, 0 };
 						    float mat_shininess[] = { 128 };
 						    gl.glMaterialfv( GL.GL_FRONT, GL.GL_AMBIENT, mat_ambient, 0);
 						    gl.glMaterialfv( GL.GL_FRONT, GL.GL_SPECULAR, mat_specular, 0);
@@ -376,13 +386,12 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Obs
 			gl.glClearDepth(1.0f);
 
 		    // white light at the eye
-		    float light0_position[] = { 0, 0, 1, 0 };
-		    float light0_diffuse[] = { 1, 1, 1, 1 };
-		    float light0_specular[] = { 1, 1, 1, 1 };
-		    gl.glLightfv( GL.GL_LIGHT0, GL.GL_POSITION, light0_position, 0);
+			float light0_position[] = { 0, 0, 1, 0 };
+	    	float light0_diffuse[] = { 1, 1, 1, 1 };
+	    	float light0_specular[] = { 1, 1, 1, 1 };
+	    	gl.glLightfv( GL.GL_LIGHT0, GL.GL_POSITION, light0_position, 0);
 		    gl.glLightfv( GL.GL_LIGHT0, GL.GL_DIFFUSE, light0_diffuse, 0);
 		    gl.glLightfv( GL.GL_LIGHT0, GL.GL_SPECULAR, light0_specular, 0);
-
 		    //material
 
 		    float lmodel_ambient[] = { 0, 0, 0, 1 };
