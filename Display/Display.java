@@ -3,6 +3,9 @@ package Display;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.io.*;
 	import java.nio.FloatBuffer;
 	import java.nio.IntBuffer;
@@ -27,9 +30,10 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
-public class Display extends JFrame implements GLEventListener, KeyListener, Observer{
+public class Display extends JFrame implements GLEventListener, KeyListener, MouseListener, MouseMotionListener, Observer{
 
 	Game g;
+	ChessBoard b;
 	Move lastMove;
 	String textInput = "";
 	float translated = 0;
@@ -204,7 +208,6 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Obs
 
 		private int winW = 800, winH = 800;
 		private boolean wireframe = false;
-		private boolean cullface = true;
 		private boolean flatshade = false;
 		
 		private float xpos = 0, ypos = 0, zpos = 0;
@@ -217,7 +220,6 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Obs
 		private objModel bishop = new objModel("bishop.obj");
 		private objModel queen = new objModel("queen.obj");
 		private objModel king = new objModel("king.obj");
-		private objModel board = new objModel("board.obj");
 
 		/* Here you should give a conservative estimate of the scene's bounding box
 		 * so that the initViewParameters function can calculate proper
@@ -227,7 +229,7 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Obs
 		private float xmin = -4f, ymin = 0f, zmin = -5f;
 		private float xmax = 4f, ymax = 0f, zmax = 5f;
 		private Texture boardTexture;	
-		
+		public float looking = -.25f;
 		
 		public synchronized void display(GLAutoDrawable drawable) {
 			if(animator.isAnimating() && (lastMove.equals(g.currentMove) || g.currentMove == null)){				
@@ -236,7 +238,20 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Obs
 			if(!animator.isAnimating() && !lastMove.equals(g.currentMove) && g.currentMove != null){
 				animator.start();
 			}
-			
+			boolean moving = false;
+			if(!lastMove.equals(b.lastMove)){
+				translated ++;
+				moving = true;
+			}
+			if(translated == 30){
+				translated = 0;
+				lastMove = b.lastMove;
+				b = g.b;
+				moving = false;
+				looking = -looking;
+				horozontalChange = 0;
+				heightChange = 0;
+			}			
 			
 			gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 			
@@ -248,24 +263,21 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Obs
 			
 				text.beginRendering(800, 800);
 				text.draw(textInput, 0, winH);
+				text.draw("Time used by White: " + g.toTime(g.player1Time), 0, 30);
+				text.draw("Time used by Black: " + g.toTime(g.player2Time), 0, 0);
 				text.endRendering();
-			
+				
 			/* this is the transformation of the entire scene */
 			gl.glTranslatef(-xpos, -ypos, -zpos);
 			gl.glTranslatef(centerx, centery, centerz);	
-						
-			if((g.turn == Color.Black || g.player1.getClass() == ComputerPlayer.class) && g.player2.getClass() == HumanPlayer.class){
-		         glu.gluLookAt(0, .57735, 1, 0, 0, 0, 0, 1, 0);
-		         gl.glNormal3f(0,0,1);
-			} else {
-		         glu.gluLookAt(0, .57735, -1, 0, 0, 0, 0, 1, 0);
-		         gl.glNormal3f(0,0,-1);
-			}
+			
+			
+	        glu.gluLookAt(horozontalChange, .144+heightChange, looking, 0, 0, 0, 0, 1, 0);
+	        gl.glNormal3f(0,0,looking);
+
 						
 			gl.glTranslatef(-centerx, -centery, -centerz);
 			
-			
-			ChessBoard b = g.b;
 			Piece p;
 						
 			float[] rgba = {1f, 1f, 1f};
@@ -275,7 +287,6 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Obs
 			
 		    boardTexture.enable();
 			boardTexture.bind();
-	//        gl.glNormal3f(0,0,1);
 			gl.glBegin(GL.GL_QUADS);
 				gl.glTexCoord2f(0, 0);
 				gl.glVertex3f(-4, 0, -4);
@@ -290,22 +301,9 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Obs
 			boardTexture.disable();
 			
 			
-			
-			boolean moving = false;
-			if(!lastMove.equals(b.lastMove)){
-				translated ++;
-				moving = true;
-			}
-			if(translated == 30){
-				translated = 0;
-				lastMove = b.lastMove;
-				moving = false;
-			}
 			float transI = (b.lastMove.From().Col()-b.lastMove.To().Col())*(1-translated/30.f);
 			float transJ = (b.lastMove.From().Row()-b.lastMove.To().Row())*(1-translated/30.f);
-			
-			System.out.println(transI + "  " + transJ);
-			
+						
 			for(int i = 0; i < 8; i++){
 				for(int j = 0; j < 8; j++){
 					p = b.pieceAt(i,j);
@@ -363,10 +361,13 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Obs
 		public Display(Game g) {
 			super("3D-Chess-Game");
 			this.g = g;
+			b = g.b;
 			lastMove = g.b.lastMove;
 			canvas = new GLCanvas();
 			canvas.addGLEventListener(this);
 			canvas.addKeyListener(this);
+			canvas.addMouseListener(this);
+			canvas.addMouseMotionListener(this);
 			g.addObserver(this);
 			animator = new FPSAnimator(canvas, 30);	// create a 30 fps animator
 			text = new TextRenderer(new Font("SansSerif", Font.BOLD, 18));
@@ -386,12 +387,22 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Obs
 			gl.glClearDepth(1.0f);
 
 		    // white light at the eye
-			float light0_position[] = { 0, 0, 1, 0 };
-	    	float light0_diffuse[] = { 1, 1, 1, 1 };
-	    	float light0_specular[] = { 1, 1, 1, 1 };
-	    	gl.glLightfv( GL.GL_LIGHT0, GL.GL_POSITION, light0_position, 0);
-		    gl.glLightfv( GL.GL_LIGHT0, GL.GL_DIFFUSE, light0_diffuse, 0);
-		    gl.glLightfv( GL.GL_LIGHT0, GL.GL_SPECULAR, light0_specular, 0);
+//			float light0_position[] = { 0, 0, 1, 0 };
+//	    	float light0_diffuse[] = { 1, 1, 1, 1 };
+//	    	float light0_specular[] = { 1, 1, 1, 1 };
+//	    	gl.glLightfv( GL.GL_LIGHT0, GL.GL_POSITION, light0_position, 0);
+//		    gl.glLightfv( GL.GL_LIGHT0, GL.GL_DIFFUSE, light0_diffuse, 0);
+//		    gl.glLightfv( GL.GL_LIGHT0, GL.GL_SPECULAR, light0_specular, 0);
+			
+	        float[] lightPos = {-30, 0, 0, 1};
+	        float[] lightColorAmbient = {0.2f, 0.2f, 0.2f, 1f};
+	        float[] lightColorSpecular = {0.8f, 0.8f, 0.8f, 1f};
+
+	        // Set light parameters.
+	        gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, lightPos, 0);
+	        gl.glLightfv(GL.GL_LIGHT1, GL.GL_AMBIENT, lightColorAmbient, 0);
+	        gl.glLightfv(GL.GL_LIGHT1, GL.GL_SPECULAR, lightColorSpecular, 0);
+			
 		    //material
 
 		    float lmodel_ambient[] = { 0, 0, 0, 1 };
@@ -454,6 +465,11 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Obs
 
 		}	
 		String validChars = "RNBQK0abcdefgh12345678x-";
+		private int mouseX;
+		private int mouseY;
+		private int mouseButton;
+		private float heightChange;
+		private float horozontalChange;
 		public void keyPressed(KeyEvent e) {
 			if((g.turn == Color.White && g.player1.getClass() == HumanPlayer.class) || (g.turn == Color.Black && g.player2.getClass() == HumanPlayer.class)){
 				if(e.getKeyCode() == KeyEvent.VK_ENTER){
@@ -474,8 +490,13 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Obs
 					}
 				}else
 				if(validChars.contains(""+e.getKeyChar())){textInput += ""+e.getKeyChar();}
+				
+				if(e.getKeyChar() == 'r'){heightChange = 0;horozontalChange = 0;}
+				
 			}
-			canvas.display();
+			if(!animator.isAnimating()){
+				animator.start();
+			}
 		}
 
 		
@@ -498,6 +519,64 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Obs
 
 		@Override
 		public void update(Observable arg0, Object arg1) {
+			if(!animator.isAnimating()){
+				animator.start();
+			}
+		}
+
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			int x = e.getX();
+			int y = e.getY();
+			if (mouseButton == MouseEvent.BUTTON1) {
+				horozontalChange -= (x - mouseX)/100.f;
+				horozontalChange = Math.max(horozontalChange, -1);
+				horozontalChange = Math.min(horozontalChange, 1);
+				
+				heightChange += (y - mouseY)/100.f;
+				heightChange = Math.max(heightChange,0);
+				heightChange = Math.min(heightChange,1);
+				mouseX = x;
+				mouseY = y;
+				canvas.display();
+			}
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			mouseX = e.getX();
+			mouseY = e.getY();
+			mouseButton = e.getButton();
+			canvas.display();
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			mouseButton = MouseEvent.NOBUTTON;
 			canvas.display();
 		}
 
