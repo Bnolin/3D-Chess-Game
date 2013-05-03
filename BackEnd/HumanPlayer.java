@@ -19,7 +19,6 @@ public class HumanPlayer extends Player {
 			e.printStackTrace();
 		}}
 		
-		b.displayBoard();
 		b.bs = new BoardState(b);
 		
 		Color c = b.turn;

@@ -151,7 +151,6 @@ public class ComputerPlayer extends Player {
 	
 	@Override
 	public Move getMove(ChessBoard b) {
-		b.displayBoard();
 
 		Node root = new Node(b.clone(),null,level);
 		Node bestN = null;

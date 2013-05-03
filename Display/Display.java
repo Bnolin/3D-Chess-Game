@@ -6,6 +6,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.io.*;
 	import java.nio.FloatBuffer;
 	import java.nio.IntBuffer;
@@ -262,7 +264,7 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 			gl.glLoadIdentity();
 			
 				text.beginRendering(800, 800);
-				text.draw(textInput, 0, winH);
+				text.draw("Input Move: " + textInput, 0, 60);
 				text.draw("Time used by White: " + g.toTime(g.player1Time), 0, 30);
 				text.draw("Time used by Black: " + g.toTime(g.player2Time), 0, 0);
 				text.endRendering();
@@ -285,21 +287,22 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 		    gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, rgba, 0);
 		    gl.glMaterialf(GL.GL_FRONT, GL.GL_SHININESS, 0.5f);
 			
+		    
 		    boardTexture.enable();
 			boardTexture.bind();
 			gl.glBegin(GL.GL_QUADS);
 				gl.glTexCoord2f(0, 0);
-				gl.glVertex3f(-4, 0, -4);
+				gl.glVertex3f(5.1f, 0, 5.1f);
 				gl.glTexCoord2f(0, 1);
-				gl.glVertex3f(-4, 0, 4);
+				gl.glVertex3f(5.1f, 0, -5.1f);
 				gl.glTexCoord2f(1, 1);
-				gl.glVertex3f(4, 0, 4);
+				gl.glVertex3f(-5.1f, 0, -5.1f);
 				gl.glTexCoord2f(1, 0);
-				gl.glVertex3f(4, 0, -4);
+				gl.glVertex3f(-5.1f, 0, 5.1f);
 			gl.glEnd();
 			gl.glFlush();
 			boardTexture.disable();
-			
+
 			
 			float transI = (b.lastMove.From().Col()-b.lastMove.To().Col())*(1-translated/30.f);
 			float transJ = (b.lastMove.From().Row()-b.lastMove.To().Row())*(1-translated/30.f);
@@ -341,16 +344,28 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 							gl.glTranslatef(0, -pawn.bottom, 0);pawn.Draw();
 							break;
 						case blackRook:case whiteRook:
+							gl.glScalef(.76f,.76f,.76f);
 							gl.glTranslatef(0, -rook.bottom, 0);rook.Draw();
 							break;
 						case blackKnight:gl.glRotatef(180, 0, 1, 0);
 						case whiteKnight:
+							gl.glScalef(.97f, .97f, .97f);
 							gl.glTranslatef(0, -knight.bottom, 0);
 							gl.glRotatef(-45,0,1,0);
 							knight.Draw();break;
-						case blackBishop:case whiteBishop:gl.glTranslatef(0, -bishop.bottom, 0);bishop.Draw();break;
-						case blackQueen:case whiteQueen:gl.glTranslatef(0, -queen.bottom, 0);queen.Draw();break;
-						case blackKing:case whiteKing:gl.glTranslatef(0, -king.bottom, 0);king.Draw();break;
+						case blackBishop:gl.glRotatef(180,0,1,0);
+						case whiteBishop:
+							gl.glTranslatef(0, -bishop.bottom, 0);
+							gl.glRotatef(45, 0, 1, 0);
+							bishop.Draw();break;
+						case blackQueen:case whiteQueen:
+							gl.glScalef(1.25f, 1.25f, 1.25f);
+							gl.glTranslatef(0, -queen.bottom, 0);queen.Draw();break;
+						case blackKing:case whiteKing:
+							gl.glScalef(1.53f, 1.53f, 1.53f);
+							gl.glTranslatef(0, -king.bottom, 0);
+							gl.glRotatef(45, 0, 1, 0);
+							king.Draw();break;
 						}
 						gl.glPopMatrix();
 					}
@@ -363,7 +378,11 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 			this.g = g;
 			b = g.b;
 			lastMove = g.b.lastMove;
-			canvas = new GLCanvas();
+			
+			GLCapabilities caps = new GLCapabilities();
+			caps.setStencilBits(8);
+			
+			canvas = new GLCanvas(caps);
 			canvas.addGLEventListener(this);
 			canvas.addKeyListener(this);
 			canvas.addMouseListener(this);
@@ -387,21 +406,12 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 			gl.glClearDepth(1.0f);
 
 		    // white light at the eye
-//			float light0_position[] = { 0, 0, 1, 0 };
-//	    	float light0_diffuse[] = { 1, 1, 1, 1 };
-//	    	float light0_specular[] = { 1, 1, 1, 1 };
-//	    	gl.glLightfv( GL.GL_LIGHT0, GL.GL_POSITION, light0_position, 0);
-//		    gl.glLightfv( GL.GL_LIGHT0, GL.GL_DIFFUSE, light0_diffuse, 0);
-//		    gl.glLightfv( GL.GL_LIGHT0, GL.GL_SPECULAR, light0_specular, 0);
-			
-	        float[] lightPos = {-30, 0, 0, 1};
-	        float[] lightColorAmbient = {0.2f, 0.2f, 0.2f, 1f};
-	        float[] lightColorSpecular = {0.8f, 0.8f, 0.8f, 1f};
-
-	        // Set light parameters.
-	        gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, lightPos, 0);
-	        gl.glLightfv(GL.GL_LIGHT1, GL.GL_AMBIENT, lightColorAmbient, 0);
-	        gl.glLightfv(GL.GL_LIGHT1, GL.GL_SPECULAR, lightColorSpecular, 0);
+			float light0_position[] = { 0, 0, 1, 0 };
+	    	float light0_diffuse[] = { 1, 1, 1, 1 };
+	    	float light0_specular[] = { 1, 1, 1, 1 };
+	    	gl.glLightfv( GL.GL_LIGHT0, GL.GL_POSITION, light0_position, 0);
+		    gl.glLightfv( GL.GL_LIGHT0, GL.GL_DIFFUSE, light0_diffuse, 0);
+		    gl.glLightfv( GL.GL_LIGHT0, GL.GL_SPECULAR, light0_specular, 0);
 			
 		    //material
 
@@ -422,9 +432,11 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 			gl.glCullFace(GL.GL_BACK);
 			gl.glEnable(GL.GL_CULL_FACE);
 			gl.glShadeModel(GL.GL_SMOOTH);
+
+			
 			
 			try {
-	            TextureData data = TextureIO.newTextureData(new File("board.png"), false, TextureIO.PNG);
+	            TextureData data = TextureIO.newTextureData(new File("board.gif"), false, TextureIO.GIF);
 	            boardTexture = TextureIO.newTexture(data);
 	        }
 	        catch (IOException exc) {
@@ -432,6 +444,8 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 	            System.exit(1);
 	        }
 		}
+		
+		
 		public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
 			winW = width;
 			winH = height;
@@ -529,12 +543,12 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 			int x = e.getX();
 			int y = e.getY();
 			if (mouseButton == MouseEvent.BUTTON1) {
-				horozontalChange -= (x - mouseX)/100.f;
+				horozontalChange += (x - mouseX)/500.f;
 				horozontalChange = Math.max(horozontalChange, -1);
 				horozontalChange = Math.min(horozontalChange, 1);
 				
-				heightChange += (y - mouseY)/100.f;
-				heightChange = Math.max(heightChange,0);
+				heightChange += (y - mouseY)/250.f;
+				heightChange = Math.max(heightChange,-.114f);
 				heightChange = Math.min(heightChange,1);
 				mouseX = x;
 				mouseY = y;
