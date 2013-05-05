@@ -1,0 +1,64 @@
+History of Chess:
+
+The origins of chess are not exactly clear. Most believe chess evolved from similar games played in India almost two thousand years ago.The game of chess we know today has been around since the 15th century where it became popular in Europe.
+
+The Goal of Chess:
+
+Chess is a game played between two opponents on opposite sides of a board containing 64 squares of alternating colors. Each player has 16 pieces: 1 King, 1 Queen, 2 Rooks, 2 Bishops, 2 Knights, and 8 Pawns. The goal of the game is to checkmate the other King. A checkmate occurs when the King is in a position to be captured (in check) and cannot escape from capture.
+
+Starting a Game:
+
+At the beginning of the game the chessboard is laid out so that each player has the white (or light) colored square in the bottom right-hand side. The chess pieces are then arranged the same way each time. The second row (or rank) is filled with Pawns. The first row contains the Rooks in each corner. The Knights are placed next to the Rooks, followed by the Bishops next to the Knights. The Queen always is placed on her own matching color (white Queen on white, black Queen on black), and the King on the remaining square. The player with the white pieces always moves first, followed by black, then white again, then black and so on until the end of the game.
+
+How the Pieces Move:
+
+Each of the 6 different kinds of pieces moves differently. Pieces cannot move through other pieces (though the Knight can jump over other pieces), and can never move onto a square with one of their own pieces. However, they can be moved to take the place of an opponent's piece which is then captured. Pieces are generally moved into positions where they can capture other pieces (by landing on their square and then replacing them), defend their own pieces in case of capture, or control important squares in the game.
+
+The King:
+
+The King is the most important piece, but is one of the weakest. The King can only move one square in any direction - up, down, to the sides, and diagonally. The king may never move himself into check (where he could be captured).
+
+The Queen:
+
+The Queen is the most powerful piece. She can move in any one straight direction - forward, backward, sideways, or diagonally - as far as possible as long as she does not move through any of her own pieces. Like with all pieces, if the Queen captures an opponent's piece her move is over.
+
+
+The Rook:
+
+The Rook may move as far as it wants, but only forward, backward, and to the sides. The Rooks are particularly powerful pieces when they are protecting each other and working together!
+
+The Bishop:
+
+The Bishop may move as far as it wants, but only diagonally. Each bishop starts on one color (light or dark) and must always stay on that color. Bishops work well together because they cover up each other’s weaknesses.
+
+The Knight:
+
+Knights move in a very different way from the other pieces – going two squares in one direction, and then one more move at a 90 degree angle, just like the shape of an “L”. Knights are also the only pieces that can move over other pieces.
+
+The Pawn:
+
+Pawns are unusual because they move and capture in different ways: they move forward, but capture diagonally. Pawns can only move forward one square at a time, except for their very first move where they can move forward two squares. Pawns can only capture one square diagonally in front of them. They can never move or capture backwards. If there is another piece directly in front of a Pawn he cannot move past or capture that piece.
+
+Promotion:
+
+Pawns have another special ability. If a pawn reaches the other side of the board it can become any other chess piece (called a promotion). A pawn may be promoted to any piece. [NOTE: A common misconception is that pawns may only be exchanged for a piece that has been captured. That is NOT true.] A Pawn is usually promoted to a Queen. Only pawns may be promoted.
+
+En Passant:
+
+The last rule about Pawns is called “en passant,” which is French for “in passing”. If a Pawn moves out two squares on its first move, and by doing so lands on the side of an opponent’s Pawn (effectively jumping past the other Pawn’s ability to capture it), that other Pawn has the option of capturing the first Pawn as it passes. This special move must be done immediately after the first Pawn has moved past, otherwise the option to capture is no longer available.
+
+Castling:
+
+One other special rule is called castling. This move allows you to: possibly move your King to safety, and get your rook out of the corner in one move. On a player’s turn he/she may move his/her King two squares over to one side and then move the Rook from that side’s corner next to the King on the opposite side. However, in order to castle, the following conditions must be met:
+	It must be that King’s very first move
+	It must be that Rook’s very first move
+	There cannot be any pieces between the King and Rook to move
+	The King may not be in check or pass through check
+
+Notice: When castling towards the King's side of the board is called castling kingside. Castling to the other side is called castling queenside. Regardless of which side, the King always moves only two squares when castling.
+
+Check & Checkmate:
+
+As stated before, the purpose of the game is to checkmate the opponent’s King. This happens when the Ling is put into check and cannot get out of check. There are only three ways a king can get out of check: move out of the way (though he cannot castle!), block the check with another piece, or capture the piece threatening the King. If a King cannot escape checkmate then the game is over. Customarily the King is not captured or removed from the board, the game is declared as over.
+
+Copyright 2013 : http://www.chess.com/learn-how-to-play-chess 
