@@ -1,3 +1,5 @@
+Each piece type (other than pawns) is identified by an uppercase letter, usually the first letter in the name of the piece in whatever language is spoken by the player recording. English-speaking players use the letter K for king, Q for queen, R for rook, B for bishop, and N for knight (since K is already used)
+
 Each move of a piece is indicated by the piece's uppercase letter, plus the coordinate of the destination square. For example, Be5 (move a bishop to e5), Nf3 (move a knight to f3), c5 (move a pawn to c5—no piece letter in the case of pawn moves).
 
 When a piece makes a capture, an "x" is inserted immediately before the destination square. For example, Bxe5 (bishop captures the piece on e5). When a pawn makes a capture, the file from which the pawn departed is used to identify the pawn. For example, exd5 (pawn on the e-file captures the piece on d5)
