@@ -21,7 +21,7 @@ public class ChessBoard{
 				board[row][col] = Piece.empty;
 			}
 		}
-/*		board[0][0] = Piece.whiteRook;
+		board[0][0] = Piece.whiteRook;
 		board[1][0] = Piece.whiteKnight;
 		board[2][0] = Piece.whiteBishop;
 		board[3][0] = Piece.whiteQueen;
@@ -45,20 +45,6 @@ public class ChessBoard{
 		}
 		WKing = new Square(4,0);
 		BKing = new Square(4,7);
-*/
-		
-		board[0][0] = Piece.whiteKing;
-		WKing = new Square(0,0);
-		board[7][7] = Piece.blackKing;
-		BKing = new Square(7,7);
-		
-		board[2][3] = Piece.whitePawn;
-		
-		BKCastle = false;
-		BQCastle = false;
-		WKCastle = false;
-		WQCastle = false;
-		
 		
 		
 		turn = Color.White;
