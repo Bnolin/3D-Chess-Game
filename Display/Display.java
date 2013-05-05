@@ -222,6 +222,7 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 		private objModel bishop = new objModel("bishop.obj");
 		private objModel queen = new objModel("queen.obj");
 		private objModel king = new objModel("king.obj");
+		private objModel board = new objModel("board.obj");
 
 		/* Here you should give a conservative estimate of the scene's bounding box
 		 * so that the initViewParameters function can calculate proper
@@ -287,7 +288,7 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 		    gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, rgba, 0);
 		    gl.glMaterialf(GL.GL_FRONT, GL.GL_SHININESS, 0.5f);
 			
-		    
+/*		    
 		    boardTexture.enable();
 			boardTexture.bind();
 			gl.glBegin(GL.GL_QUADS);
@@ -302,6 +303,12 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 			gl.glEnd();
 			gl.glFlush();
 			boardTexture.disable();
+	*/		
+		    gl.glPushMatrix();
+			gl.glScalef(8, 8, 8);
+		    board.Draw();
+		    gl.glPopMatrix();
+			
 
 			
 			float transI = (b.lastMove.From().Col()-b.lastMove.To().Col())*(1-translated/30.f);
@@ -406,13 +413,12 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 			gl.glClearDepth(1.0f);
 
 		    // white light at the eye
-			float light0_position[] = { 0, 0, 1, 0 };
+			float light0_position[] = { 4, 0, 4, 0 };
 	    	float light0_diffuse[] = { 1, 1, 1, 1 };
 	    	float light0_specular[] = { 1, 1, 1, 1 };
 	    	gl.glLightfv( GL.GL_LIGHT0, GL.GL_POSITION, light0_position, 0);
 		    gl.glLightfv( GL.GL_LIGHT0, GL.GL_DIFFUSE, light0_diffuse, 0);
 		    gl.glLightfv( GL.GL_LIGHT0, GL.GL_SPECULAR, light0_specular, 0);
-			
 		    //material
 
 		    float lmodel_ambient[] = { 0, 0, 0, 1 };
@@ -422,8 +428,6 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 		    gl.glEnable( GL.GL_NORMALIZE );
 		    gl.glEnable( GL.GL_LIGHTING );
 		    gl.glEnable( GL.GL_LIGHT0 );
-		    gl.glEnable( GL.GL_LIGHT1 );
-		    gl.glEnable( GL.GL_LIGHT2 );
 	
 		    
 		    gl.glEnable(GL.GL_DEPTH_TEST);
