@@ -1,14 +1,20 @@
+package GUI;
+
+import Backend.*;
+import Display.*;
+
 import java.awt.*;
 import java.awt.Color;
 import java.awt.event.*;
 import javax.swing.*;
+
 import java.io.*;
 import javax.imageio.ImageIO;
 
-
 public class GUI implements ActionListener{
     
-    //Global GUI variable
+    private static final int EXIT_ON_CLOSE = 0;
+	//Global GUI variable
     static GUI GUI = new GUI();
     //Global Frame for GUI
     static JFrame frame = new JFrame("3-D Chess Game");
@@ -85,56 +91,70 @@ public class GUI implements ActionListener{
         return contentPane;
     }
 
-    ButtonGroup Players = new ButtonGroup();
-    ButtonGroup Difficulty = new ButtonGroup();
+    //Global Variable for the Player Selection in Settings Menu
+    private int PlayerSelection = 0;
+    //Global Variable for the Difficulty Selection in Settings Menu
+    private int DifficultySelection = 0;
+    //For use in creating a New Game, Default set to Human vs. Computer
+	private Player Player1 = new HumanPlayer();
+	//For use in creating a New Game, Default set to Easy Difficulty
+	private Player Player2 = new ComputerPlayer(3);
     
     public JOptionPane createSettingsJOptionPane(){
     //Creating the JOptionPane for Settings
     JPanel panel = new JPanel();
     //Creating a label for Player Options
     JLabel players = new JLabel("Player vs. Player:");
-    //Creating a label for Difficulty Options
-    JLabel difficulty = new JLabel("Difficulty:");
-    //Creating a spacer to put between groups of buttons
-    JLabel spacer = new JLabel("                     ");
-   
-    //Creating All Radio Buttons for Players and add then to Players ButtonGroup
-    JRadioButton HumanVSComputer = new JRadioButton("Human vs. Computer");
-    Players.add(HumanVSComputer);
-    JRadioButton ComputerVSHuman = new JRadioButton("Computer vs. Human");
-    Players.add(ComputerVSHuman);
-    JRadioButton ComputerVSComputer = new JRadioButton("Computer vs. Computer");
-    Players.add(ComputerVSComputer);
-    JRadioButton HumanVSHuman = new JRadioButton("Human vs. Human");
-    Players.add(HumanVSHuman);
-    
-    //Creating All Radio Buttons for Difficulty
-    JRadioButton Easy = new JRadioButton("Easy");
-    Difficulty.add(Easy);
-    JRadioButton Medium = new JRadioButton("Medium");
-    Difficulty.add(Medium);
-    JRadioButton Hard = new JRadioButton("Hard");
-    Difficulty.add(Hard);
-    
-    //Adding Buttons to panel
-    //Add Players Buttons to panel
+    //Creating the options for the Players ComboBox   
+    String playerList[] = {"Human vs. Computer", "Computer vs. Human", "Computer vs. Computer", "Human vs. Human"};
+    //Creating the players ComboBox
+    JComboBox playersCB = new JComboBox(playerList);
+    //Setting starting index for players ComboBox
+    playersCB.setSelectedIndex(0);
+    //Add Player Options Label and ComboBox
     panel.add(players);
-    panel.add(HumanVSComputer);
-    panel.add(ComputerVSHuman);
-    panel.add(ComputerVSComputer);
-    panel.add(HumanVSHuman);
-    //spacer
-    panel.add(spacer,"span, grow");
-    //Add Difficulty Buttons to panel
+    panel.add(playersCB);
+    JLabel difficulty = new JLabel("Difficulty:");
+    //Creating the options for the difficulty ComboBox   
+    String difficultyList[] = {"Easy", "Medium", "Hard"};
+    //Creating the difficulty ComboBox
+    JComboBox difficultyCB = new JComboBox(difficultyList);
+    //Setting starting index for difficulty ComboBox
+    difficultyCB.setSelectedIndex(0);
     panel.add(difficulty);
-    panel.add(Easy);
-    panel.add(Medium);
-    panel.add(Hard);
+    panel.add(difficultyCB);
    
     JOptionPane pane = new JOptionPane();
-    JOptionPane.showOptionDialog(frame, panel, "Settings", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+    int result = JOptionPane.showOptionDialog(frame, panel, "Settings", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE , null, null, null);
+    if (result == JOptionPane.OK_OPTION){
+		int Player = playersCB.getSelectedIndex();
+		int Difficulty = difficultyCB.getSelectedIndex();
+		PlayerSelection = Player;
+		DifficultySelection = Difficulty;
+		
+			switch(PlayerSelection){
+			case 0: 
+				Player1 = new HumanPlayer();
+				Player2 = new ComputerPlayer(DifficultySelection + 3);
+				break;
+			case 1:
+				Player1 = new ComputerPlayer(DifficultySelection + 3);
+				Player2 = new HumanPlayer();
+				break;
+			case 2:
+				Player1 = new ComputerPlayer(DifficultySelection + 3);
+				Player2 = new ComputerPlayer(DifficultySelection + 3);
+				break;
+			case 3:
+				Player1 = new HumanPlayer();
+				Player2 = new HumanPlayer();
+				break;
+			}		
+	}
     return pane;
     }
+    
+   
     
     public JOptionPane createChessNotationJOptionPane(){
     	//Creating the JOptionPane for Chess Notation
@@ -234,18 +254,25 @@ public class GUI implements ActionListener{
      
     }
     
-//Variables for storing the settings
 
     
-@SuppressWarnings("deprecation")
 public void actionPerformed(ActionEvent e){
-	
 		if (e.getActionCommand().equals("New Game")){
-			/*Game g = new Game(new ComputerPlayer(5), new ComputerPlayer(5));
+			
+			/*Game g = new Game(Player1, Player2);
 			Display d = new Display(g);
-			Container frame1 = d.getContentPane();
-			frame.setContentPane(frame1);
-			g.playGame();*/
+			/*d.canvas.setSize(winW, winH);
+			d.setLocationRelativeTo(null);
+			d.setDefaultCloseOperation(EXIT_ON_CLOSE);
+			setVisible(true);*/
+			//g.playGame();
+			//d.canvas.setVisible(true);
+			//d.canvas.requestFocus();
+			//d.setDefaultCloseOperation(EXIT_ON_CLOSE);*/
+			
+			Game g = new Game(new HumanPlayer(), new ComputerPlayer(5));
+			Display d = new Display(g);			
+			g.playGame();
 			
 		}
 
