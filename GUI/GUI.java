@@ -181,7 +181,7 @@ public class GUI implements ActionListener{
         textArea.setWrapStyleWord(true);
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        scrollPane.setPreferredSize(new Dimension(800,800));
+        scrollPane.setPreferredSize(new Dimension(700,600));
         JOptionPane.showMessageDialog(null, scrollPane , "Chess Notation", JOptionPane.INFORMATION_MESSAGE, null);
         return pane;
         }
@@ -212,7 +212,7 @@ public class GUI implements ActionListener{
     textArea.setCaretPosition(0);
     JScrollPane scrollPane = new JScrollPane(textArea);
     scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    scrollPane.setPreferredSize(new Dimension(800,800));
+    scrollPane.setPreferredSize(new Dimension(700,700));
     JOptionPane.showMessageDialog(null, scrollPane , "How To Play", JOptionPane.INFORMATION_MESSAGE, null);
     return pane;
     }

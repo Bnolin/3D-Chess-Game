@@ -1,19 +1,14 @@
 Chess Notation:
 
-Each piece type (other than Pawns) is identified by an upper-case letter, usually the first letter of the name of the piece. 
-E.g. The letter K for King, Q for Queen, R for Rook, B for Bishop, and N for Knight (since K is already used for the King)
+Each piece type (other than Pawns) is identified by an upper-case letter, usually the first letter of the name of the piece. E.g. The letter K for King, Q for Queen, R for Rook, B for Bishop, and N for Knight (since K is already used for the King)
 
 Moving Pieces:
 
-Each move of a piece is indicated by the piece's upper-case letter, plus the coordinate of the destination square. 
-For example, Be5 (moves a Bishop to e5), Nf3 (moves a Knight to f3), c5 (move a pawn to c5 no upper-case letter is needed for moving Pawns).
+Each move of a piece is indicated by the piece's upper-case letter, plus the coordinate of the destination square. For example, Be5 (moves a Bishop to e5), Nf3 (moves a Knight to f3), c5 (move a pawn to c5 no upper-case letter is needed for moving Pawns).
 
 Capturing Pieces:
 
-When a piece makes a capture, an "x" is inserted immediately before the destination square. 
-For example, Bxe5 (Bishop captures the piece on e5). 
-When a Pawn makes a capture, the square from which the pawn departed is used to identify the pawn. 
-For example, exd5 (pawn on the e-square captures the piece on d5)
+When a piece makes a capture, an "x" is inserted immediately before the destination square. For example, Bxe5 (Bishop captures the piece on e5). When a Pawn makes a capture, the square from which the pawn departed is used to identify the pawn. For example, exd5 (pawn on the e-square captures the piece on d5)
 
 Castling:
 
