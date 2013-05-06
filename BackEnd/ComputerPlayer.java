@@ -27,7 +27,8 @@ public class ComputerPlayer extends Player {
 						for(Square s: n.bs.moves[curSquare.hashCode()]){
 							if(n.bs.moveType(new Move(curSquare,s)).isValid()){						
 								Move m = new Move(curSquare,s);
-								allMoves.add(m);
+								if(bs.moveType(m) == MoveType.take){allMoves.add(0,m);}
+								else{allMoves.add(m);}
 							}
 						}
 					}
@@ -41,10 +42,10 @@ public class ComputerPlayer extends Player {
 				if(!newNode.bs.inCheck(n.b.turn)){
 					if(n.b.turn == Color.White){
 						alpha = Math.max(alpha, alphaBeta(newNode,alpha,beta));
-						if(beta <= alpha){return alpha;}
+						if(beta <= alpha){killer[depth] = m;return alpha;}
 					} else {
 						beta = Math.min(beta, alphaBeta(newNode,alpha,beta));
-						if(beta <= alpha){return beta;}
+						if(beta <= alpha){killer[depth] = m;return beta;}
 					}
 
 				}
@@ -144,9 +145,11 @@ public class ComputerPlayer extends Player {
 	}
 	
 	public int level;
+	public Move[] killer;
 	
 	public ComputerPlayer(int level){
 		this.level = level;
+		killer = new Move[level];
 	}
 	
 	@Override
