@@ -5,6 +5,25 @@ import java.util.concurrent.TimeUnit;
 
 
 public class Game  extends Observable{
+	
+	public class runningThread implements Runnable{
+
+		public Game g;
+		public Thread t;
+		
+		public runningThread(Game g){
+			t = new Thread(this);
+			this.g = g;
+		}
+		
+		
+		@Override
+		public void run() {
+			g.playGame();
+		}
+		
+	}
+	
 	public ChessBoard b;
 	public BoardState bs;
 	public Color turn = Color.White;
@@ -13,6 +32,7 @@ public class Game  extends Observable{
 	public Player player2; // Black
 	public long player1Time = 0;
 	public long player2Time = 0;
+	public runningThread t;
 	
 	
 	public Game(Player p1, Player p2){
@@ -20,9 +40,10 @@ public class Game  extends Observable{
 		bs = new BoardState(b);
 		player1 = p1;
 		player2 = p2;
+		t = new runningThread(this);
 	}
 	
-	public synchronized void turn(){
+	public void turn(){
 		Player p;
 		if(turn == Color.White){p = player1;}
 		else{p = player2;}
@@ -107,5 +128,9 @@ public class Game  extends Observable{
 		b.displayBoard();
 		displayGame();
 	}
+	
+	
+	
+	
 	
 }

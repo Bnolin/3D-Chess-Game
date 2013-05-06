@@ -270,10 +270,10 @@ public void actionPerformed(ActionEvent e){
 			//d.canvas.requestFocus();
 			//d.setDefaultCloseOperation(EXIT_ON_CLOSE);*/
 			
-			Game g = new Game(new HumanPlayer(), new ComputerPlayer(5));
-			Display d = new Display(g);			
-			g.playGame();
-			
+			Game g = new Game(new ComputerPlayer(5), new ComputerPlayer(5));
+			Display d = new Display(g);
+			g.t.t.start();
+
 		}
 
 		if (e.getActionCommand().equals("Chess Notation")){

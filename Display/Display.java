@@ -202,10 +202,10 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 		}
 		
 		/* GL, display, model transformation, and mouse control variables */
-		private final GLCanvas canvas;
+		public final GLCanvas canvas;
 		private GL gl;
 		private final GLU glu = new GLU();	
-		private FPSAnimator animator;
+		public FPSAnimator animator;
 		private TextRenderer text;
 
 		private int winW = 800, winH = 800;
@@ -236,7 +236,7 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 		
 		public synchronized void display(GLAutoDrawable drawable) {
 			if(animator.isAnimating() && (lastMove.equals(g.currentMove) || g.currentMove == null)){				
-				animator.stop();				
+				animator.stop();
 			}
 			if(!animator.isAnimating() && !lastMove.equals(g.currentMove) && g.currentMove != null){
 				animator.start();
@@ -288,7 +288,7 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 		    gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, rgba, 0);
 		    gl.glMaterialf(GL.GL_FRONT, GL.GL_SHININESS, 0.5f);
 			
-/*		    
+		    
 		    boardTexture.enable();
 			boardTexture.bind();
 			gl.glBegin(GL.GL_QUADS);
@@ -303,12 +303,6 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 			gl.glEnd();
 			gl.glFlush();
 			boardTexture.disable();
-	*/		
-		    gl.glPushMatrix();
-			gl.glScalef(8, 8, 8);
-		    board.Draw();
-		    gl.glPopMatrix();
-			
 
 			
 			float transI = (b.lastMove.From().Col()-b.lastMove.To().Col())*(1-translated/30.f);
@@ -358,7 +352,6 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 						case whiteKnight:
 							gl.glScalef(.97f, .97f, .97f);
 							gl.glTranslatef(0, -knight.bottom, 0);
-							gl.glRotatef(-45,0,1,0);
 							knight.Draw();break;
 						case blackBishop:gl.glRotatef(180,0,1,0);
 						case whiteBishop:
@@ -396,7 +389,7 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 			canvas.addMouseMotionListener(this);
 			g.addObserver(this);
 			animator = new FPSAnimator(canvas, 30);	// create a 30 fps animator
-			text = new TextRenderer(new Font("SansSerif", Font.BOLD, 18));
+			text = new TextRenderer(new Font("Serif",Font.PLAIN, 18));
 			getContentPane().add(canvas);
 			setSize(winW, winH);
 			setLocationRelativeTo(null);
