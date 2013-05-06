@@ -306,7 +306,70 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 			
 			float transI = (b.lastMove.From().Col()-b.lastMove.To().Col())*(1-translated/30.f);
 			float transJ = (b.lastMove.From().Row()-b.lastMove.To().Row())*(1-translated/30.f);
-						
+			
+/////////////////////////////////////////			
+			System.out.println(g.takenPiece);
+			if(g.takenPiece != null && moving){
+				gl.glPushMatrix();
+				
+				if(g.takenPiece.color() == Color.White){
+				    float mat_ambient[] = { 0, 0, 0, 1 };
+				    float mat_specular[] = { 1, 1, 1, 1 };
+				    float mat_diffuse[] = { 1, 1, 1, 1 };
+				    float mat_shininess[] = { 128 };
+				    gl.glMaterialfv( GL.GL_FRONT, GL.GL_AMBIENT, mat_ambient, 0);
+				    gl.glMaterialfv( GL.GL_FRONT, GL.GL_SPECULAR, mat_specular, 0);
+				    gl.glMaterialfv( GL.GL_FRONT, GL.GL_DIFFUSE, mat_diffuse, 0);
+				    gl.glMaterialfv( GL.GL_FRONT, GL.GL_SHININESS, mat_shininess, 0);
+				} else {
+				    float mat_ambient[] = { 0f, 0f, 0f, 1 };
+				    float mat_specular[] = { 1, 1, 1, 1 };
+				    float mat_diffuse[] = { .3f, .3f, .3f, 0 };
+				    float mat_shininess[] = { 128 };
+				    gl.glMaterialfv( GL.GL_FRONT, GL.GL_AMBIENT, mat_ambient, 0);
+				    gl.glMaterialfv( GL.GL_FRONT, GL.GL_SPECULAR, mat_specular, 0);
+				    gl.glMaterialfv( GL.GL_FRONT, GL.GL_DIFFUSE, mat_diffuse, 0);
+				    gl.glMaterialfv( GL.GL_FRONT, GL.GL_SHININESS, mat_shininess, 0);
+				}
+				gl.glTranslatef(-.5f, 0, .5f);
+				gl.glTranslatef(4-g.b.lastMove.To().Col(), 0, g.b.lastMove.To().Row()-4);
+				gl.glScalef(1,1-translated/30.f,1);
+				switch(g.takenPiece){
+				case blackPawn:case whitePawn:
+					gl.glScalef(.75f, .75f, .75f);
+					gl.glTranslatef(0, -pawn.bottom, 0);pawn.Draw();
+					break;
+				case blackRook:case whiteRook:
+					gl.glScalef(.76f,.76f,.76f);
+					gl.glTranslatef(0, -rook.bottom, 0);rook.Draw();
+					break;
+				case blackKnight:gl.glRotatef(180, 0, 1, 0);
+				case whiteKnight:
+					gl.glScalef(.97f, .97f, .97f);
+					gl.glTranslatef(0, -knight.bottom, 0);
+					knight.Draw();break;
+				case blackBishop:gl.glRotatef(180,0,1,0);
+				case whiteBishop:
+					gl.glTranslatef(0, -bishop.bottom, 0);
+					gl.glRotatef(45, 0, 1, 0);
+					bishop.Draw();break;
+				case blackQueen:case whiteQueen:
+					gl.glScalef(1.25f, 1.25f, 1.25f);
+					gl.glTranslatef(0, -queen.bottom, 0);queen.Draw();break;
+				case blackKing:case whiteKing:
+					gl.glScalef(1.53f, 1.53f, 1.53f);
+					gl.glTranslatef(0, -king.bottom, 0);
+					gl.glRotatef(45, 0, 1, 0);
+					king.Draw();break;
+				}
+				gl.glPopMatrix();
+			}
+			
+			
+			
+			
+			
+////////////////////////////////////////////						
 			for(int i = 0; i < 8; i++){
 				for(int j = 0; j < 8; j++){
 					p = b.pieceAt(i,j);
@@ -404,7 +467,7 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 			gl.glClearDepth(1.0f);
 
 		    // white light at the eye
-			float light0_position[] = { 4, 0, 4, 0 };
+			float light0_position[] = { 0, 0, 1, 0 };
 	    	float light0_diffuse[] = { 1, 1, 1, 1 };
 	    	float light0_specular[] = { 1, 1, 1, 1 };
 	    	gl.glLightfv( GL.GL_LIGHT0, GL.GL_POSITION, light0_position, 0);

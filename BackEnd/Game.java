@@ -33,6 +33,7 @@ public class Game  extends Observable{
 	public long player1Time = 0;
 	public long player2Time = 0;
 	public runningThread t;
+	public Piece takenPiece = null;
 	
 	
 	public Game(Player p1, Player p2){
@@ -55,6 +56,11 @@ public class Game  extends Observable{
 				System.out.println("Sorry Move Invalid");
 			} else {
 				ChessBoard backUpB = b.clone();
+				if(bs.moveType(currentMove) == MoveType.take || bs.moveType(currentMove) == MoveType.enPassant){
+					takenPiece = b.pieceAt(currentMove.To());
+				} else {
+					takenPiece = null;
+				}
 				b.move(currentMove); hasMoved = true;
 				if(bs.inCheck(turn)){
 					b.setBoard(backUpB);
@@ -79,6 +85,7 @@ public class Game  extends Observable{
 		setChanged();
 		notifyObservers();
 		turn = turn.opposite();
+		System.out.println(currentMove.string);
 	}
 	public String toTime(long milsec){
 			long min = TimeUnit.MILLISECONDS.toMinutes(milsec);

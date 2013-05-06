@@ -1,4 +1,6 @@
+package Backend;
 import java.util.ArrayList;
+
 
 public class ChessBoard{
 
@@ -45,6 +47,20 @@ public class ChessBoard{
 		}
 		WKing = new Square(4,0);
 		BKing = new Square(4,7);
+
+/*		
+		board[0][0] = Piece.whiteKing;
+		WKing = new Square(0,0);
+		board[7][7] = Piece.blackKing;
+		BKing = new Square(7,7);
+		
+		board[2][3] = Piece.whitePawn;
+		
+		BKCastle = false;
+		BQCastle = false;
+		WKCastle = false;
+		WQCastle = false;
+*/		
 		
 		
 		turn = Color.White;
@@ -157,7 +173,7 @@ public class ChessBoard{
 		BKing = b.BKing.clone();
 		turn = b.turn;
 		turns = b.turns;
-		bs.generateState();
+		if(bs != null){	bs.generateState();}
 	}
 	
 	public String toString(){
