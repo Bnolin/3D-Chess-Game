@@ -205,7 +205,7 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 		public final GLCanvas canvas;
 		private GL gl;
 		private final GLU glu = new GLU();	
-		public FPSAnimator animator;
+		private FPSAnimator animator;
 		private TextRenderer text;
 
 		private int winW = 800, winH = 800;
@@ -222,7 +222,6 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 		private objModel bishop = new objModel("bishop.obj");
 		private objModel queen = new objModel("queen.obj");
 		private objModel king = new objModel("king.obj");
-		private objModel board = new objModel("board.obj");
 
 		/* Here you should give a conservative estimate of the scene's bounding box
 		 * so that the initViewParameters function can calculate proper
@@ -236,7 +235,7 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 		
 		public synchronized void display(GLAutoDrawable drawable) {
 			if(animator.isAnimating() && (lastMove.equals(g.currentMove) || g.currentMove == null)){				
-				animator.stop();
+				animator.stop();				
 			}
 			if(!animator.isAnimating() && !lastMove.equals(g.currentMove) && g.currentMove != null){
 				animator.start();
@@ -251,7 +250,8 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 				lastMove = b.lastMove;
 				b = g.b;
 				moving = false;
-				looking = -looking;
+				if(g.player1.getClass() == HumanPlayer.class && g.turn == Color.White){looking = -.25f;}
+				if(g.player2.getClass() == HumanPlayer.class && g.turn == Color.Black){looking = .25f;}
 				horozontalChange = 0;
 				heightChange = 0;
 			}			
@@ -288,7 +288,7 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 		    gl.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, rgba, 0);
 		    gl.glMaterialf(GL.GL_FRONT, GL.GL_SHININESS, 0.5f);
 			
-		    
+    
 		    boardTexture.enable();
 			boardTexture.bind();
 			gl.glBegin(GL.GL_QUADS);
@@ -303,7 +303,6 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 			gl.glEnd();
 			gl.glFlush();
 			boardTexture.disable();
-
 			
 			float transI = (b.lastMove.From().Col()-b.lastMove.To().Col())*(1-translated/30.f);
 			float transJ = (b.lastMove.From().Row()-b.lastMove.To().Row())*(1-translated/30.f);
@@ -374,22 +373,18 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 		}	
 		
 		public Display(Game g) {
-			super("3D-Chess-Game");
+			//super("3D-Chess-Game");
 			this.g = g;
 			b = g.b;
-			lastMove = g.b.lastMove;
-			
-			GLCapabilities caps = new GLCapabilities();
-			caps.setStencilBits(8);
-			
-			canvas = new GLCanvas(caps);
+			lastMove = g.b.lastMove;			
+			canvas = new GLCanvas();
 			canvas.addGLEventListener(this);
 			canvas.addKeyListener(this);
 			canvas.addMouseListener(this);
 			canvas.addMouseMotionListener(this);
 			g.addObserver(this);
 			animator = new FPSAnimator(canvas, 30);	// create a 30 fps animator
-			text = new TextRenderer(new Font("Serif",Font.PLAIN, 18));
+			text = new TextRenderer(new Font("SansSerif", Font.BOLD, 18));
 			getContentPane().add(canvas);
 			setSize(winW, winH);
 			setLocationRelativeTo(null);
@@ -397,6 +392,9 @@ public class Display extends JFrame implements GLEventListener, KeyListener, Mou
 			setVisible(true);
 			animator.start();
 			canvas.requestFocus();
+			dispose();
+		
+			
 		}
 		public void init(GLAutoDrawable drawable) {
 			gl = drawable.getGL();

@@ -19,11 +19,12 @@ public class GUI implements ActionListener{
     //Global Frame for GUI
     static JFrame frame = new JFrame("3-D Chess Game");
 
-
+    JMenu menu;
+    
     public JMenuBar createMenuBar() {
     	//Create variables used for the Menu Bar
         JMenuBar menuBar;
-        JMenu menu;
+        
         JMenuItem menuItem;
 
         //Create the MenuBar
@@ -78,7 +79,9 @@ public class GUI implements ActionListener{
         //Adding Action Listener for Exit
         menuItem.addActionListener(this);
         menu.add(menuItem);
- 
+        menu.addActionListener(this);
+        menu.setActionCommand("Menu");
+        
         return menuBar;
         
         
@@ -125,7 +128,7 @@ public class GUI implements ActionListener{
     panel.add(difficultyCB);
    
     JOptionPane pane = new JOptionPane();
-    int result = JOptionPane.showOptionDialog(frame, panel, "Settings", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE , null, null, null);
+    int result = JOptionPane.showOptionDialog(panel, panel, "Settings", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE , null, null, null);
     if (result == JOptionPane.OK_OPTION){
 		int Player = playersCB.getSelectedIndex();
 		int Difficulty = difficultyCB.getSelectedIndex();
@@ -182,7 +185,7 @@ public class GUI implements ActionListener{
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setPreferredSize(new Dimension(700,600));
-        JOptionPane.showMessageDialog(null, scrollPane , "Chess Notation", JOptionPane.INFORMATION_MESSAGE, null);
+        JOptionPane.showMessageDialog(pane, scrollPane , "Chess Notation", JOptionPane.INFORMATION_MESSAGE, null);
         return pane;
         }
     
@@ -213,18 +216,19 @@ public class GUI implements ActionListener{
     JScrollPane scrollPane = new JScrollPane(textArea);
     scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
     scrollPane.setPreferredSize(new Dimension(700,700));
-    JOptionPane.showMessageDialog(null, scrollPane , "How To Play", JOptionPane.INFORMATION_MESSAGE, null);
+    JOptionPane.showMessageDialog(frame, scrollPane , "How To Play", JOptionPane.INFORMATION_MESSAGE, null);
     return pane;
     }
     
     
+    private static JLabel background;
 
    //Creating and showing the GUI
     
     public static void createAndShowGUI() {
         //Create and set up the window.
       
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(frame.EXIT_ON_CLOSE);
 
         //Create and set up the content pane.
      
@@ -233,17 +237,69 @@ public class GUI implements ActionListener{
         Color bgcolor = new Color(1,1,1);
         frame.getContentPane().setBackground(bgcolor);
         
-        //Setting the Background Image
-        try{
-    		frame.getContentPane().add(new JLabel(new ImageIcon (ImageIO.read(new File("background.png")))));
+        //frame.setLayout(new BorderLayout());
+    	background = new JLabel(new ImageIcon("background.png"));
+    	frame.add(background);
+    	//background.setLayout(new FlowLayout());
     	
-    		}
-    		catch(IOException e){
-    			e.printStackTrace();
-    		}
+    	JButton newGameButton = new JButton("New Game");
+     	background.add(newGameButton);
+     	newGameButton.setSize(120,30);
+     	newGameButton.setLocation(340,200);
+        newGameButton.addActionListener( new ActionListener() {
+             @Override
+             public void actionPerformed( ActionEvent aActionEvent ) {
+             frame.setContentPane(GUI.createChessNotationJOptionPane());
+             }
+           } );
+    	
+    	JButton chessNotationButton = new JButton("Chess Notation");
+    	background.add(chessNotationButton);
+    	chessNotationButton.setSize(120,30);
+    	chessNotationButton.setLocation(340,270);
+        chessNotationButton.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent aActionEvent ) {
+            frame.setContentPane(GUI.createChessNotationJOptionPane());
+            }
+          } );
         
-    
+       
+        JButton howToPlayButton = new JButton("How To Play");
+    	background.add(howToPlayButton);
+    	howToPlayButton.setSize(120,30);
+    	howToPlayButton.setLocation(340,340);
+    	howToPlayButton.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent aActionEvent ) {
+            frame.setContentPane(GUI.createChessNotationJOptionPane());
+            }
+          } );
+    	
+    	
+        JButton settingsButton = new JButton("Settings");
+    	background.add(settingsButton);
+    	settingsButton.setSize(120,30);
+    	settingsButton.setLocation(340,410);
+    	settingsButton.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent aActionEvent ) {
+            frame.setContentPane(GUI.createChessNotationJOptionPane());
+            }
+          } );
+    	
+    	JButton fullScreenButton = new JButton("Full Screen");
+       	background.add(fullScreenButton);
+       	fullScreenButton.setSize(120,30);
+       	fullScreenButton.setLocation(340,480);
+       	fullScreenButton.addActionListener( new ActionListener() {
+               @Override
+               public void actionPerformed( ActionEvent aActionEvent ) {
+               frame.setContentPane(GUI.createChessNotationJOptionPane());
+               }
+             } );
         
+    	
         //Display the window.
         frame.setSize(800, 800);
         //Frame is not re-sizable
@@ -257,22 +313,20 @@ public class GUI implements ActionListener{
 
     
 public void actionPerformed(ActionEvent e){
+		if (e.getActionCommand().equals("Menu")){
+			menu.requestFocus();
+		}
 		if (e.getActionCommand().equals("New Game")){
-			
-			/*Game g = new Game(Player1, Player2);
+			Game g = new Game(Player1, Player2);
 			Display d = new Display(g);
-			/*d.canvas.setSize(winW, winH);
-			d.setLocationRelativeTo(null);
-			d.setDefaultCloseOperation(EXIT_ON_CLOSE);
-			setVisible(true);*/
-			//g.playGame();
-			//d.canvas.setVisible(true);
-			//d.canvas.requestFocus();
-			//d.setDefaultCloseOperation(EXIT_ON_CLOSE);*/
+			frame.remove(background);
+			frame.getContentPane().add(d.canvas);
+			d.canvas.requestFocus();
+			d.canvas.setVisible(true);
+			frame.setSize(850,800);
 			
-			Game g = new Game(new ComputerPlayer(5), new ComputerPlayer(5));
-			Display d = new Display(g);
 			g.t.t.start();
+			
 
 		}
 
@@ -292,12 +346,12 @@ public void actionPerformed(ActionEvent e){
 		}
 		
 		if (e.getActionCommand().equals("Full Screen")){
-			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); 
+			/*Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); 
 			int width = screenSize.width;
 			int height = screenSize.height;
 			frame.resize(width, height);
-			frame.setLocationRelativeTo(null);
-			//frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+			frame.setLocationRelativeTo(null);*/
+			frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 		}
     	
 		
