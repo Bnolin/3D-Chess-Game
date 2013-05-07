@@ -253,7 +253,7 @@ public class GUI implements ActionListener{
     static MP3 gamemp3;
     public static void createAndShowGUI() {
     	
-    	menump3 = new MP3(mp3File1);
+    	menump3 = new MP3("menu.mp3");
     	menump3.play();
     	
         //Create and set up the window.
@@ -289,7 +289,7 @@ public class GUI implements ActionListener{
         			g.t.t.start();
         		    menu.add(menuExitItem);
         			menump3.close();
-        			gamemp3 = new MP3(mp3File2);
+        			gamemp3 = new MP3("Beethoven.mp3");
         			gamemp3.play();
              }
            } );
@@ -401,7 +401,7 @@ public void actionPerformed(ActionEvent e){
 			g.t.t.start();
 		    menu.add(menuExitItem);
 			menump3.close();
-			gamemp3 = new MP3(mp3File2);
+			gamemp3 = new MP3("Beethoven.mp3");
 			gamemp3.play();
 			
 
@@ -472,13 +472,9 @@ public void actionPerformed(ActionEvent e){
     	
     }
 
-	private static String mp3File1;
-	private static String mp3File2;
     public static void main(String[] args) {
         //Schedule a job for the event-dispatching thread:
         //Creating and showing this application's GUI.
-    	mp3File1 = args[0];
-    	mp3File2 = args[1];
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 createAndShowGUI();
