@@ -9,7 +9,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import java.io.*;
-import javax.imageio.ImageIO;
+
 
 public class GUI implements ActionListener{
     
@@ -19,7 +19,10 @@ public class GUI implements ActionListener{
     //Global Frame for GUI
     static JFrame frame = new JFrame("3-D Chess Game");
 
-    JMenu menu;
+    private static JMenu menu;
+    private static JMenuItem menuExitItem;
+    private static JMenuItem menuFullScreenItem;
+    private static JMenuItem menuExitFullScreenItem;
     
     public JMenuBar createMenuBar() {
     	//Create variables used for the Menu Bar
@@ -66,12 +69,23 @@ public class GUI implements ActionListener{
         menuItem.addActionListener(this);
         menu.add(menuItem);
         //Menu Item for Full Screen, can be selected by Mouse Click, or by CTRL + F
-        menuItem = new JMenuItem("Full Screen", KeyEvent.VK_F);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(
+        menuFullScreenItem = new JMenuItem("Full Screen", KeyEvent.VK_F);
+        menuFullScreenItem.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_F, ActionEvent.CTRL_MASK));
         //Adding Action Listener for Full Screen
-        menuItem.addActionListener(this);
-        menu.add(menuItem);
+        menuFullScreenItem.addActionListener(this);
+        menu.add(menuFullScreenItem);
+        //Menu Item for exiting Full Screen mode, can be selected by Mouse Click or CTRL + Z
+        menuExitFullScreenItem = new JMenuItem ("Exit Full Screen", KeyEvent.VK_Z);
+        menuExitFullScreenItem.setAccelerator(KeyStroke.getKeyStroke(
+        		KeyEvent.VK_Z, ActionEvent.CTRL_MASK));
+        menuExitFullScreenItem.addActionListener(this);
+        //Menu Item for Exiting Game, can be selected by Mouse Click, or by CTRL + Escape
+        menuExitItem = new JMenuItem("Exit Game", KeyEvent.VK_ESCAPE);
+        menuExitItem.setAccelerator(KeyStroke.getKeyStroke(
+                KeyEvent.VK_ESCAPE, ActionEvent.CTRL_MASK));
+        //Adding Action Listener for Exit
+        menuExitItem.addActionListener(this);
         //Menu Item for Exit, can be selected by Mouse Click, or by CTRL + E
         menuItem = new JMenuItem("Exit", KeyEvent.VK_E);
         menuItem.setAccelerator(KeyStroke.getKeyStroke(
@@ -79,6 +93,7 @@ public class GUI implements ActionListener{
         //Adding Action Listener for Exit
         menuItem.addActionListener(this);
         menu.add(menuItem);
+        //Adding Action Listener to Menu
         menu.addActionListener(this);
         menu.setActionCommand("Menu");
         
@@ -99,9 +114,9 @@ public class GUI implements ActionListener{
     //Global Variable for the Difficulty Selection in Settings Menu
     private int DifficultySelection = 0;
     //For use in creating a New Game, Default set to Human vs. Computer
-	private Player Player1 = new HumanPlayer();
+	private static Player Player1 = new HumanPlayer();
 	//For use in creating a New Game, Default set to Easy Difficulty
-	private Player Player2 = new ComputerPlayer(3);
+	private static Player Player2 = new ComputerPlayer(3);
     
     public JOptionPane createSettingsJOptionPane(){
     //Creating the JOptionPane for Settings
@@ -154,6 +169,7 @@ public class GUI implements ActionListener{
 				break;
 			}		
 	}
+    pane.removeAll();
     return pane;
     }
     
@@ -186,6 +202,7 @@ public class GUI implements ActionListener{
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setPreferredSize(new Dimension(700,600));
         JOptionPane.showMessageDialog(pane, scrollPane , "Chess Notation", JOptionPane.INFORMATION_MESSAGE, null);
+        pane.removeAll();
         return pane;
         }
     
@@ -217,15 +234,28 @@ public class GUI implements ActionListener{
     scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
     scrollPane.setPreferredSize(new Dimension(700,700));
     JOptionPane.showMessageDialog(frame, scrollPane , "How To Play", JOptionPane.INFORMATION_MESSAGE, null);
+    pane.removeAll();
     return pane;
     }
     
     
     private static JLabel background;
+    private static JButton newGameButton;
+    private static JButton chessNotationButton;
+    private static JButton howToPlayButton;
+    private static JButton settingsButton;
+    private static JButton fullScreenButton;
+    private static JButton exitFullScreenButton;
 
    //Creating and showing the GUI
     
+    static MP3 menump3;
+    static MP3 gamemp3;
     public static void createAndShowGUI() {
+    	
+    	menump3 = new MP3(mp3File1);
+    	menump3.play();
+    	
         //Create and set up the window.
       
         frame.setDefaultCloseOperation(frame.EXIT_ON_CLOSE);
@@ -242,18 +272,29 @@ public class GUI implements ActionListener{
     	frame.add(background);
     	//background.setLayout(new FlowLayout());
     	
-    	JButton newGameButton = new JButton("New Game");
+    	newGameButton = new JButton("New Game");
      	background.add(newGameButton);
      	newGameButton.setSize(120,30);
      	newGameButton.setLocation(340,200);
         newGameButton.addActionListener( new ActionListener() {
              @Override
              public void actionPerformed( ActionEvent aActionEvent ) {
-             frame.setContentPane(GUI.createChessNotationJOptionPane());
+            		Game g = new Game(Player1, Player2);
+        			Display d = new Display(g);
+        			frame.remove(background);
+        			frame.getContentPane().add(d.canvas);
+        			d.canvas.requestFocus();
+        			d.canvas.setVisible(true);
+        			frame.setSize(850,800);
+        			g.t.t.start();
+        		    menu.add(menuExitItem);
+        			menump3.close();
+        			gamemp3 = new MP3(mp3File2);
+        			gamemp3.play();
              }
            } );
     	
-    	JButton chessNotationButton = new JButton("Chess Notation");
+    	chessNotationButton = new JButton("Chess Notation");
     	background.add(chessNotationButton);
     	chessNotationButton.setSize(120,30);
     	chessNotationButton.setLocation(340,270);
@@ -265,39 +306,71 @@ public class GUI implements ActionListener{
           } );
         
        
-        JButton howToPlayButton = new JButton("How To Play");
+        howToPlayButton = new JButton("How To Play");
     	background.add(howToPlayButton);
     	howToPlayButton.setSize(120,30);
     	howToPlayButton.setLocation(340,340);
     	howToPlayButton.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed( ActionEvent aActionEvent ) {
-            frame.setContentPane(GUI.createChessNotationJOptionPane());
+             frame.setContentPane(GUI.createHowToPlayJOptionPane());
             }
           } );
     	
     	
-        JButton settingsButton = new JButton("Settings");
+        settingsButton = new JButton("Settings");
     	background.add(settingsButton);
     	settingsButton.setSize(120,30);
     	settingsButton.setLocation(340,410);
     	settingsButton.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed( ActionEvent aActionEvent ) {
-            frame.setContentPane(GUI.createChessNotationJOptionPane());
+            frame.setContentPane(GUI.createSettingsJOptionPane());
             }
           } );
     	
-    	JButton fullScreenButton = new JButton("Full Screen");
+    	exitFullScreenButton = new JButton("Exit Full Screen");
+       	exitFullScreenButton.addActionListener( new ActionListener() {
+               @Override
+               public void actionPerformed( ActionEvent aActionEvent ) {
+            	   //Display the window.
+                   frame.setSize(800, 800);
+                   //Frame is not re-sizable
+                   frame.setResizable(false);
+                   frame.setVisible(true);
+                   //Centering the window
+                   frame.setLocationRelativeTo(null);
+                   menuExitFullScreenItem.setVisible(false);
+               }
+             } );
+    	
+    	fullScreenButton = new JButton("Full Screen");
        	background.add(fullScreenButton);
        	fullScreenButton.setSize(120,30);
        	fullScreenButton.setLocation(340,480);
        	fullScreenButton.addActionListener( new ActionListener() {
                @Override
                public void actionPerformed( ActionEvent aActionEvent ) {
-               frame.setContentPane(GUI.createChessNotationJOptionPane());
+       			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); 
+    			/*frame.resize(width, height);
+    			frame.setLocationRelativeTo(null);*/
+    			background.remove(fullScreenButton);
+    			background.add(exitFullScreenButton);
+    			menu.add(menuExitFullScreenItem);
+    			exitFullScreenButton.setEnabled(true);
+    			exitFullScreenButton.setVisible(true);
+    			menuFullScreenItem.setVisible(false);
+    			int height = (screenSize.height - 800)/2;
+    			frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+    			newGameButton.setLocation((screenSize.width/2-60), height + 200);
+    			chessNotationButton.setLocation((screenSize.width/2-60), height + 270);
+    			howToPlayButton.setLocation((screenSize.width/2-60), height + 340);
+    			settingsButton.setLocation((screenSize.width/2-60), height + 410);
+    			exitFullScreenButton.setLocation((screenSize.width/2-60), height + 480);
                }
              } );
+       	
+    
         
     	
         //Display the window.
@@ -317,6 +390,7 @@ public void actionPerformed(ActionEvent e){
 			menu.requestFocus();
 		}
 		if (e.getActionCommand().equals("New Game")){
+			
 			Game g = new Game(Player1, Player2);
 			Display d = new Display(g);
 			frame.remove(background);
@@ -324,8 +398,24 @@ public void actionPerformed(ActionEvent e){
 			d.canvas.requestFocus();
 			d.canvas.setVisible(true);
 			frame.setSize(850,800);
-			
 			g.t.t.start();
+		    menu.add(menuExitItem);
+			menump3.close();
+			gamemp3 = new MP3(mp3File2);
+			gamemp3.play();
+			
+
+		}
+		if (e.getActionCommand().equals("Exit Game")){
+			frame.setContentPane(background);
+			frame.setBackground(new Color (1,1,1));
+			background.requestFocus();
+			background.setVisible(true);
+			frame.setSize(800,800);
+			newGameButton.setVisible(true);
+			menu.remove(menuExitItem);
+			gamemp3.close();
+			menump3.play();
 			
 
 		}
@@ -346,26 +436,49 @@ public void actionPerformed(ActionEvent e){
 		}
 		
 		if (e.getActionCommand().equals("Full Screen")){
-			/*Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); 
-			int width = screenSize.width;
-			int height = screenSize.height;
-			frame.resize(width, height);
-			frame.setLocationRelativeTo(null);*/
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); 
+			background.remove(fullScreenButton);
+			background.add(exitFullScreenButton);
+			menu.add(menuExitFullScreenItem);
+			exitFullScreenButton.setEnabled(true);
+			exitFullScreenButton.setVisible(true);
+			menuFullScreenItem.setVisible(false);
+			int height = (screenSize.height - 800)/2;
 			frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+			newGameButton.setLocation((screenSize.width/2-60), height + 200);
+			chessNotationButton.setLocation((screenSize.width/2-60), height + 270);
+			howToPlayButton.setLocation((screenSize.width/2-60), height + 340);
+			settingsButton.setLocation((screenSize.width/2-60), height + 410);
+			exitFullScreenButton.setLocation((screenSize.width/2-60), height + 480);			
 		}
     	
+		if (e.getActionCommand().equals("Exit Full Screen")){
+			  //Display the window.
+	        frame.setSize(800, 800);
+	        //Frame is not re-sizable
+	        frame.setResizable(false);
+	        frame.setVisible(true);
+	        //Centering the window
+	        frame.setLocationRelativeTo(null);
+	        menuExitFullScreenItem.setVisible(false);
+	        menuFullScreenItem.setVisible(true);
+	        fullScreenButton.setVisible(true);
+			
+		}
 		
 		if (e.getActionCommand().equals("Exit")){
 			System.exit(0);
 		}
     	
     }
-    
-    
-  
+
+	private static String mp3File1;
+	private static String mp3File2;
     public static void main(String[] args) {
         //Schedule a job for the event-dispatching thread:
         //Creating and showing this application's GUI.
+    	mp3File1 = args[0];
+    	mp3File2 = args[1];
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 createAndShowGUI();
