@@ -19,21 +19,25 @@ public class GUI implements ActionListener{
     //Global Frame for GUI
     static JFrame frame = new JFrame("3-D Chess Game");
 
+    //Global menu 
     private static JMenu menu;
+    //Global menu item for Exiting A Game
     private static JMenuItem menuExitItem;
+    //Global menu item for entering Full Screen Mode
     private static JMenuItem menuFullScreenItem;
+    //Global menu item for exiting Full Screen Mode
     private static JMenuItem menuExitFullScreenItem;
     
     public JMenuBar createMenuBar() {
-    	//Create variables used for the Menu Bar
+    	//Creating menuBar
         JMenuBar menuBar;
-        
+        //Menu item for all other options
         JMenuItem menuItem;
 
-        //Create the MenuBar
+        //Creating the MenuBar
         menuBar = new JMenuBar();
 
-        //Build the File Menu
+        //Building the File Menu
         menu = new JMenu("File");
         menuBar.add(menu);
 
@@ -96,7 +100,6 @@ public class GUI implements ActionListener{
         //Adding Action Listener to Menu
         menu.addActionListener(this);
         menu.setActionCommand("Menu");
-        
         return menuBar;
         
         
@@ -149,7 +152,7 @@ public class GUI implements ActionListener{
 		int Difficulty = difficultyCB.getSelectedIndex();
 		PlayerSelection = Player;
 		DifficultySelection = Difficulty;
-		
+		//Deciding how to start the new game based upon the result of the JOptionPane
 			switch(PlayerSelection){
 			case 0: 
 				Player1 = new HumanPlayer();
@@ -169,6 +172,7 @@ public class GUI implements ActionListener{
 				break;
 			}		
 	}
+    //fix JOptionPane glitch
     pane.removeAll();
     return pane;
     }
@@ -202,6 +206,7 @@ public class GUI implements ActionListener{
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setPreferredSize(new Dimension(700,600));
         JOptionPane.showMessageDialog(pane, scrollPane , "Chess Notation", JOptionPane.INFORMATION_MESSAGE, null);
+        //Fix JOptionPane Glitch
         pane.removeAll();
         return pane;
         }
@@ -235,10 +240,11 @@ public class GUI implements ActionListener{
     scrollPane.setPreferredSize(new Dimension(700,700));
     JOptionPane.showMessageDialog(frame, scrollPane , "How To Play", JOptionPane.INFORMATION_MESSAGE, null);
     pane.removeAll();
+    //Fix JOptionPane Glitch
     return pane;
     }
     
-    
+    //Creating Global JLabel and JButtons
     private static JLabel background;
     private static JButton newGameButton;
     private static JButton chessNotationButton;
@@ -247,10 +253,12 @@ public class GUI implements ActionListener{
     private static JButton fullScreenButton;
     private static JButton exitFullScreenButton;
 
-   //Creating and showing the GUI
-    
+    //MP3 for Menu
     static MP3 menump3;
+    //MP3 for Game
     static MP3 gamemp3;
+    
+    //Creating and showing the GUI
     public static void createAndShowGUI() {
     	
     	menump3 = new MP3("menu.mp3");
@@ -267,11 +275,21 @@ public class GUI implements ActionListener{
         Color bgcolor = new Color(1,1,1);
         frame.getContentPane().setBackground(bgcolor);
         
-        //frame.setLayout(new BorderLayout());
+        //Setting the background 
     	background = new JLabel(new ImageIcon("background.png"));
+    	//Adding background image to frame
     	frame.add(background);
-    	//background.setLayout(new FlowLayout());
     	
+    	//Setting Default Frame Options
+        //Display the window.
+        frame.setSize(800, 800);
+        //Frame is not re-sizable
+        frame.setResizable(false);
+        frame.setVisible(true);
+        //Centering the window
+        frame.setLocationRelativeTo(null);
+
+    	//New Game Button
     	newGameButton = new JButton("New Game");
      	background.add(newGameButton);
      	newGameButton.setSize(120,30);
@@ -294,6 +312,7 @@ public class GUI implements ActionListener{
              }
            } );
     	
+        //Chess Notation Button
     	chessNotationButton = new JButton("Chess Notation");
     	background.add(chessNotationButton);
     	chessNotationButton.setSize(120,30);
@@ -305,7 +324,7 @@ public class GUI implements ActionListener{
             }
           } );
         
-       
+        //How to Play Button
         howToPlayButton = new JButton("How To Play");
     	background.add(howToPlayButton);
     	howToPlayButton.setSize(120,30);
@@ -317,7 +336,7 @@ public class GUI implements ActionListener{
             }
           } );
     	
-    	
+    	//Settings Button
         settingsButton = new JButton("Settings");
     	background.add(settingsButton);
     	settingsButton.setSize(120,30);
@@ -326,9 +345,15 @@ public class GUI implements ActionListener{
             @Override
             public void actionPerformed( ActionEvent aActionEvent ) {
             frame.setContentPane(GUI.createSettingsJOptionPane());
+            newGameButton.setEnabled(true);
+			chessNotationButton.setEnabled(true);
+			howToPlayButton.setEnabled(true);
+			settingsButton.setEnabled(true);
+		
             }
           } );
     	
+    	//Exiting Full Screen Mode Button
     	exitFullScreenButton = new JButton("Exit Full Screen");
        	exitFullScreenButton.addActionListener( new ActionListener() {
                @Override
@@ -344,6 +369,7 @@ public class GUI implements ActionListener{
                }
              } );
     	
+       	//Entering Full Screen Mode Button
     	fullScreenButton = new JButton("Full Screen");
        	background.add(fullScreenButton);
        	fullScreenButton.setSize(120,30);
@@ -369,17 +395,6 @@ public class GUI implements ActionListener{
     			exitFullScreenButton.setLocation((screenSize.width/2-60), height + 480);
                }
              } );
-       	
-    
-        
-    	
-        //Display the window.
-        frame.setSize(800, 800);
-        //Frame is not re-sizable
-        frame.setResizable(false);
-        frame.setVisible(true);
-        //Centering the window
-        frame.setLocationRelativeTo(null);
      
     }
     
@@ -412,10 +427,14 @@ public void actionPerformed(ActionEvent e){
 			background.requestFocus();
 			background.setVisible(true);
 			frame.setSize(800,800);
-			newGameButton.setVisible(true);
 			menu.remove(menuExitItem);
 			gamemp3.close();
 			menump3.play();
+			newGameButton.setVisible(true);
+			chessNotationButton.setVisible(true);
+			howToPlayButton.setVisible(true);
+			settingsButton.setVisible(true);
+			fullScreenButton.setVisible(true);
 			
 
 		}
@@ -438,11 +457,9 @@ public void actionPerformed(ActionEvent e){
 		if (e.getActionCommand().equals("Full Screen")){
 			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); 
 			background.remove(fullScreenButton);
-			background.add(exitFullScreenButton);
 			menu.add(menuExitFullScreenItem);
-			exitFullScreenButton.setEnabled(true);
-			exitFullScreenButton.setVisible(true);
 			menuFullScreenItem.setVisible(false);
+			background.add(exitFullScreenButton);			
 			int height = (screenSize.height - 800)/2;
 			frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 			newGameButton.setLocation((screenSize.width/2-60), height + 200);
